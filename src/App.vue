@@ -11,9 +11,9 @@ import InventoryStep from './components/wizard/InventoryStep.vue'
 import CharacterSheet from './components/CharacterSheet.vue'
 import type { Skill, Hand, TalentSlot, WeaponSlot } from './types'
 
-// Password gate for preview deployments
-const previewPassword = import.meta.env.VITE_PREVIEW_PASSWORD as string | undefined
-const authenticated = ref(!previewPassword)
+// Password gate for preview deployments (client-side only, not real security)
+const previewPassword = 'dusty2026'
+const authenticated = ref(false)
 const passwordInput = ref('')
 const passwordError = ref(false)
 
