@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --color-duster-black: #000000;
+  --color-duster-white: #ffffff;
+  --color-duster-gray: #666666;
+  --color-duster-light: #f5f5f5;
+  --color-duster-border: #333333;
+  --font-western: 'Georgia', 'Times New Roman', serif;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .character-sheet,
+  .character-sheet * {
+    visibility: visible;
+  }
+  .character-sheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  @page {
+    size: letter portrait;
+    margin: 0.5in;
+  }
+}
