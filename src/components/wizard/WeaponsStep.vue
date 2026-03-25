@@ -33,7 +33,7 @@ function getWeapon(name: string) {
 
 <template>
   <div>
-    <h2 class="text-2xl font-bold mb-2">Weapons</h2>
+    <h2 class="text-2xl font-bold mb-2">Starting Inventory</h2>
     <p class="text-gray-600 mb-6">Select your starting weapons.</p>
 
     <div class="space-y-3 max-w-xl">

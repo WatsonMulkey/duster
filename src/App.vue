@@ -51,7 +51,7 @@ const steps = [
   'Gift',
   'Starting Talent',
   'Talents',
-  'Weapons',
+  'Starting Inventory',
   'Details',
 ]
 
@@ -61,7 +61,7 @@ const canProceed = computed(() => {
     case 1: return state.keenSkill !== null
     case 2: return true
     case 3: return state.startingTalent !== null
-    case 4: return xpRemaining.value >= 0
+    case 4: return true
     case 5: return true
     case 6: return state.name.trim() !== ''
     default: return false
