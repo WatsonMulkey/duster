@@ -173,7 +173,7 @@ function updateWeapons(weaponSlots: WeaponSlot[]) {
   <div v-else class="min-h-screen bg-white">
     <header class="border-b border-gray-200 px-6 py-4">
       <div class="max-w-3xl mx-auto flex items-center justify-between">
-        <h1 class="text-xl font-bold tracking-wider" style="font-family: Georgia, serif;">DUSTER</h1>
+        <img src="/duster-logo.png" alt="DUSTER" class="h-8" />
         <span class="text-sm text-gray-500">Character Creator</span>
       </div>
     </header>

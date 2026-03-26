@@ -53,11 +53,8 @@ const allTalentRows = [
   <div class="character-sheet bg-white text-black w-[8.5in] min-h-[11in] p-[0.4in] font-['Arial',sans-serif] text-[9pt] leading-tight">
     <!-- HEADER -->
     <div class="flex items-start gap-4 mb-3">
-      <!-- Logo placeholder -->
-      <div class="bg-black text-white px-4 py-2 font-bold text-2xl tracking-widest italic shrink-0"
-           style="font-family: 'Georgia', serif;">
-        DUSTER
-      </div>
+      <!-- Logo -->
+      <img src="/duster-logo.png" alt="DUSTER" class="h-10 shrink-0" />
 
       <div class="flex-1 grid grid-cols-[1fr_auto] gap-x-4 items-start">
         <div>
