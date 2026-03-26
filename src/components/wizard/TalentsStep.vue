@@ -7,10 +7,13 @@ const props = defineProps<{
   slots: (TalentSlot | null)[]
   startingTalent: string | null
   xpRemaining: number
+  xpTotal: number
+  level: number
 }>()
 
 const emit = defineEmits<{
   update: [index: number, slot: TalentSlot | null]
+  'update:level': [level: number]
 }>()
 
 const tiers: MasteryTier[] = ['Novice', 'Skilled', 'Expert', 'Master']
@@ -47,10 +50,23 @@ function setTier(index: number, tier: MasteryTier) {
 <template>
   <div>
     <h2 class="text-2xl font-bold mb-2">Choose Additional Talents</h2>
-    <p class="text-gray-600 mb-1">Select up to 3 additional talents and set their mastery tier.</p>
-    <p class="text-sm mb-6" :class="xpRemaining < 0 ? 'text-red-600 font-bold' : 'text-gray-500'">
-      XP Remaining: {{ xpRemaining }} / {{ xpRemaining + slots.reduce((sum, s) => sum + (s ? ({'Novice':2,'Skilled':3,'Expert':4,'Master':6}[s.tier]) : 0), 0) }}
-    </p>
+    <p class="text-gray-600 mb-4">Select up to 3 additional talents and set their mastery tier.</p>
+
+    <div class="flex items-center gap-4 mb-6 p-3 bg-gray-50 rounded-lg max-w-xl">
+      <div class="flex items-center gap-2">
+        <label class="font-semibold text-sm">Level</label>
+        <select
+          :value="level"
+          @change="emit('update:level', Number(($event.target as HTMLSelectElement).value))"
+          class="border rounded px-2 py-1 w-16 text-center"
+        >
+          <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
+        </select>
+      </div>
+      <div class="text-sm text-gray-600">
+        XP: <strong>{{ xpTotal - xpRemaining }}</strong> / {{ xpTotal }} spent
+      </div>
+    </div>
 
     <div class="space-y-4 max-w-xl">
       <div v-for="(slot, idx) in slots" :key="idx" class="p-4 border rounded-lg">

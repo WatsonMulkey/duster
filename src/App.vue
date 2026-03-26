@@ -224,7 +224,10 @@ function updateWeapons(weaponSlots: WeaponSlot[]) {
         :slots="state.talents"
         :starting-talent="state.startingTalent"
         :xp-remaining="xpRemaining"
+        :xp-total="xpTotal"
+        :level="state.level"
         @update="updateTalent"
+        @update:level="(l: number) => state.level = l"
       />
       <WeaponsStep
         v-if="currentStep === 5"
