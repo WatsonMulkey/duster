@@ -105,12 +105,12 @@ function talentLabel(t: Talent): string {
     <div class="space-y-4 max-w-xl">
       <div v-for="(slot, idx) in slots" :key="idx" class="p-4 border rounded-lg">
         <div class="flex items-center gap-3 mb-2">
-          <span class="font-semibold text-sm text-gray-500">Skill {{ idx + 2 }}</span>
+          <span class="font-semibold text-sm text-gray-500 shrink-0">Skill {{ idx + 2 }}</span>
           <select
             :value="slot?.name ?? ''"
             @change="setTalent(idx, ($event.target as HTMLSelectElement).value)"
             :disabled="!canAffordNewTalent(idx)"
-            class="flex-1 border rounded px-2 py-1"
+            class="flex-1 min-w-0 border rounded px-2 py-1"
             :class="!canAffordNewTalent(idx) ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : ''"
           >
             <option value="">{{ canAffordNewTalent(idx) ? '-- None --' : '-- Not enough XP --' }}</option>
