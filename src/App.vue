@@ -6,10 +6,10 @@ import KeenSkillStep from './components/wizard/KeenSkillStep.vue'
 import GiftStep from './components/wizard/GiftStep.vue'
 import StartingTalentStep from './components/wizard/StartingTalentStep.vue'
 import TalentsStep from './components/wizard/TalentsStep.vue'
-import WeaponsStep from './components/wizard/WeaponsStep.vue'
+import StartingItemsStep from './components/wizard/StartingItemsStep.vue'
 import InventoryStep from './components/wizard/InventoryStep.vue'
 import CharacterSheet from './components/CharacterSheet.vue'
-import type { Skill, Hand, TalentSlot, WeaponSlot } from './types'
+import type { Skill, Hand, TalentSlot, StartingItem } from './types'
 
 // Password gate for preview deployments (client-side only, not real security)
 const previewPassword = 'dusty2026'
@@ -62,7 +62,7 @@ const canProceed = computed(() => {
     case 2: return true
     case 3: return state.startingTalent !== null
     case 4: return true
-    case 5: return true
+    case 5: return state.startingItems.length > 0
     case 6: return state.name.trim() !== ''
     default: return false
   }
@@ -105,8 +105,8 @@ function updateTalent(index: number, slot: TalentSlot | null) {
   state.talents[index] = slot
 }
 
-function updateWeapons(weaponSlots: WeaponSlot[]) {
-  state.weapons = weaponSlots
+function updateStartingItems(items: StartingItem[]) {
+  state.startingItems = items
 }
 </script>
 
@@ -163,6 +163,7 @@ function updateWeapons(weaponSlots: WeaponSlot[]) {
         :starting-talent="state.startingTalent"
         :talent-slots="state.talents"
         :weapon-slots="state.weapons"
+        :starting-items="state.startingItems"
         :inventory="state.inventory"
         :energy-modifiers="energyModifiers"
       />
@@ -229,10 +230,11 @@ function updateWeapons(weaponSlots: WeaponSlot[]) {
         @update="updateTalent"
         @update:level="(l: number) => state.level = l"
       />
-      <WeaponsStep
+      <StartingItemsStep
         v-if="currentStep === 5"
-        :slots="state.weapons"
-        @update="updateWeapons"
+        :specialty="state.specialty!"
+        :items="state.startingItems"
+        @update="updateStartingItems"
       />
       <InventoryStep
         v-if="currentStep === 6"

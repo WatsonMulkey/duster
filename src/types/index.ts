@@ -62,6 +62,7 @@ export interface CharacterState {
   startingTalent: string | null
   talents: (TalentSlot | null)[]
   weapons: WeaponSlot[]
+  startingItems: StartingItem[]
   inventory: string
   hand: Hand
   level: number
@@ -74,4 +75,11 @@ export interface TalentSlot {
 
 export interface WeaponSlot {
   name: string
+}
+
+export interface StartingItem {
+  name: string
+  tableNumber: number
+  tableName: string
+  roll: number
 }

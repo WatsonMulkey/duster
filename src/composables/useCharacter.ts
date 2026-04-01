@@ -29,6 +29,7 @@ export function useCharacter() {
     startingTalent: null,
     talents: [null, null, null],
     weapons: [],
+    startingItems: [],
     inventory: '',
     hand: 'Right',
     level: 1,
@@ -130,6 +131,7 @@ export function useCharacter() {
     state.selectedGiftIndex = 0
     state.startingTalent = null
     state.talents = [null, null, null]
+    state.startingItems = []
   }
 
   function reset() {
@@ -140,6 +142,7 @@ export function useCharacter() {
     state.startingTalent = null
     state.talents = [null, null, null]
     state.weapons = []
+    state.startingItems = []
     state.inventory = ''
     state.hand = 'Right'
     state.level = 1

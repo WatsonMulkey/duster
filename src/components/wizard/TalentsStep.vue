@@ -3,6 +3,13 @@ import { computed } from 'vue'
 import { talents } from '../../data/talents'
 import type { Talent, TalentSlot, MasteryTier } from '../../types'
 
+const XP_COST: Record<MasteryTier, number> = {
+  Novice: 2,
+  Skilled: 3,
+  Expert: 4,
+  Master: 6,
+}
+
 const props = defineProps<{
   slots: (TalentSlot | null)[]
   startingTalent: string | null
@@ -31,6 +38,25 @@ function getTalent(name: string): Talent | undefined {
   return talents.find((t) => t.name === name)
 }
 
+function hasPrerequisite(t: Talent): boolean {
+  return !!t.prerequisite && t.prerequisite !== 'None.'
+}
+
+/** Can the player afford to set slot[slotIndex] to the given tier? */
+function canAffordTier(slotIndex: number, tier: MasteryTier): boolean {
+  const slot = props.slots[slotIndex]
+  const currentCost = slot ? XP_COST[slot.tier] : 0
+  const newCost = XP_COST[tier]
+  return (props.xpRemaining + currentCost - newCost) >= 0
+}
+
+/** Can this empty slot afford at least a Novice talent? */
+function canAffordNewTalent(slotIndex: number): boolean {
+  const slot = props.slots[slotIndex]
+  if (slot) return true // already has a talent, dropdown stays enabled
+  return props.xpRemaining >= XP_COST.Novice
+}
+
 function setTalent(index: number, name: string) {
   if (name === '') {
     emit('update', index, null)
@@ -41,9 +67,16 @@ function setTalent(index: number, name: string) {
 
 function setTier(index: number, tier: MasteryTier) {
   const slot = props.slots[index]
-  if (slot) {
+  if (slot && canAffordTier(index, tier)) {
     emit('update', index, { name: slot.name, tier })
   }
+}
+
+function talentLabel(t: Talent): string {
+  if (hasPrerequisite(t)) {
+    return `\u{1F512} ${t.name} (Req: ${t.prerequisite})`
+  }
+  return t.name
 }
 </script>
 
@@ -65,6 +98,7 @@ function setTier(index: number, tier: MasteryTier) {
       </div>
       <div class="text-sm text-gray-600">
         XP: <strong>{{ xpTotal - xpRemaining }}</strong> / {{ xpTotal }} spent
+        <span v-if="xpRemaining > 0" class="ml-1 text-green-600">({{ xpRemaining }} left)</span>
       </div>
     </div>
 
@@ -75,25 +109,34 @@ function setTier(index: number, tier: MasteryTier) {
           <select
             :value="slot?.name ?? ''"
             @change="setTalent(idx, ($event.target as HTMLSelectElement).value)"
+            :disabled="!canAffordNewTalent(idx)"
             class="flex-1 border rounded px-2 py-1"
+            :class="!canAffordNewTalent(idx) ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : ''"
           >
-            <option value="">-- None --</option>
+            <option value="">{{ canAffordNewTalent(idx) ? '-- None --' : '-- Not enough XP --' }}</option>
             <option v-if="slot" :value="slot.name">{{ slot.name }}</option>
             <option v-for="t in availableTalents" :key="t.name" :value="t.name">
-              {{ t.name }}
+              {{ talentLabel(t) }}
             </option>
           </select>
         </div>
 
-        <div v-if="slot" class="flex gap-2 mt-2">
+        <div v-if="slot" class="flex gap-2 mt-2 flex-wrap">
           <button
             v-for="tier in tiers"
             :key="tier"
             @click="setTier(idx, tier)"
+            :disabled="!canAffordTier(idx, tier)"
             class="px-3 py-1 text-xs border rounded transition-all"
-            :class="slot.tier === tier ? 'bg-black text-white border-black' : 'border-gray-300 hover:border-black'"
+            :class="[
+              slot.tier === tier
+                ? 'bg-black text-white border-black'
+                : canAffordTier(idx, tier)
+                  ? 'border-gray-300 hover:border-black'
+                  : 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50',
+            ]"
           >
-            {{ tier }}
+            {{ tier }} <span class="opacity-60">({{ XP_COST[tier] }})</span>
           </button>
         </div>
 

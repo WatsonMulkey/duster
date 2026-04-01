@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { Gift, Skill, EnergyGroup, MasteryTier, TalentSlot, WeaponSlot, Hand } from '../types'
-import { weapons } from '../data/weapons'
+import type { Gift, Skill, EnergyGroup, MasteryTier, TalentSlot, WeaponSlot, StartingItem, Hand } from '../types'
 import { talents } from '../data/talents'
 
 const props = defineProps<{
@@ -17,6 +16,7 @@ const props = defineProps<{
   startingTalent: string | null
   talentSlots: (TalentSlot | null)[]
   weaponSlots: WeaponSlot[]
+  startingItems: StartingItem[]
   inventory: string
   energyModifiers: Record<EnergyGroup, number>
 }>()
@@ -28,10 +28,6 @@ const energyGroups: { name: EnergyGroup; skills: Skill[] }[] = [
   { name: 'Physical', skills: ['Force', 'Reflex', 'Coordination'] },
   { name: 'Emotional', skills: ['Persuasion', 'Deception', 'Intuition'] },
 ]
-
-function getWeapon(name: string) {
-  return weapons.find((w) => w.name === name)
-}
 
 function getTalent(name: string) {
   return talents.find((t) => t.name === name)
@@ -181,35 +177,15 @@ const allTalentRows = [
           <div class="border border-black p-2 min-h-[80px] text-[8pt] whitespace-pre-wrap">{{ inventory || '\u00A0' }}</div>
         </div>
 
-        <!-- Weapons -->
+        <!-- Starting Items -->
         <div>
-          <div class="bg-black text-white font-bold text-sm px-2 py-1 mb-1">WEAPONS</div>
-          <table class="w-full text-[8pt] border-collapse">
-            <thead>
-              <tr class="text-left">
-                <th class="border-b border-black pb-0.5">Weapon</th>
-                <th class="border-b border-black pb-0.5 text-center">Dmg</th>
-                <th class="border-b border-black pb-0.5 text-center">Range</th>
-                <th class="border-b border-black pb-0.5">Notes</th>
-                <th class="border-b border-black pb-0.5 text-center">Dodge</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(ws, idx) in weaponSlots" :key="idx">
-                <template v-if="getWeapon(ws.name)">
-                  <td class="py-0.5">{{ ws.name }}</td>
-                  <td class="text-center">{{ getWeapon(ws.name)!.damageModifier }}</td>
-                  <td class="text-center">{{ getWeapon(ws.name)!.maxRange }}</td>
-                  <td>{{ getWeapon(ws.name)!.notes }}</td>
-                  <td class="text-center">{{ getWeapon(ws.name)!.dodgeMod }}</td>
-                </template>
-              </tr>
-              <tr v-for="i in Math.max(0, 3 - weaponSlots.length)" :key="'empty-' + i">
-                <td class="py-0.5">&nbsp;</td>
-                <td></td><td></td><td></td><td></td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="bg-black text-white font-bold text-sm px-2 py-1 mb-1">STARTING ITEMS</div>
+          <ul class="text-[8pt] space-y-0.5 pl-1">
+            <li v-for="(item, idx) in startingItems" :key="idx" class="py-0.5">
+              {{ item.name }}
+            </li>
+            <li v-if="startingItems.length === 0" class="py-0.5 text-gray-400">None</li>
+          </ul>
         </div>
       </div>
     </div>
