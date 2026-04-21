@@ -31,7 +31,7 @@ const availableTalents = computed(() => {
   for (const slot of props.slots) {
     if (slot) used.add(slot.name)
   }
-  return talents.filter((t) => !used.has(t.name))
+  return talents.filter((t) => !used.has(t.name) && isTalentAvailable(t))
 })
 
 function getTalent(name: string): Talent | undefined {
@@ -61,6 +61,14 @@ function isPrereqSatisfied(prereq: string): boolean {
       .map((s) => s.name.toUpperCase()),
   )
   return candidates.some((name) => mastered.has(name.toUpperCase()))
+}
+
+// A talent is available when: no prereq, narrative prereq (GM discretion), or mechanical prereq satisfied.
+function isTalentAvailable(t: Talent): boolean {
+  if (!hasPrerequisite(t)) return true
+  const candidates = parseMasteryPrereq(t.prerequisite!)
+  if (!candidates) return true
+  return isPrereqSatisfied(t.prerequisite!)
 }
 
 /** Can the player afford to set slot[slotIndex] to the given tier? */
