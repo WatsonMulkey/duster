@@ -123,6 +123,15 @@ function talentLabel(t: Talent): string {
       </div>
     </div>
 
+    <div v-if="startingTalent && getTalent(startingTalent)" class="max-w-xl mb-4">
+      <div class="p-4 rounded-lg bg-black text-white">
+        <div class="font-bold">{{ startingTalent }}</div>
+        <div class="text-sm mt-1 opacity-85">
+          {{ getTalent(startingTalent)!.novice }}
+        </div>
+      </div>
+    </div>
+
     <div class="space-y-4 max-w-xl">
       <div v-for="(slot, idx) in slots" :key="idx" class="p-4 border rounded-lg">
         <div class="flex items-center gap-3 mb-2">
