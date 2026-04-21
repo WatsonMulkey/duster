@@ -42,6 +42,27 @@ function hasPrerequisite(t: Talent): boolean {
   return !!t.prerequisite && t.prerequisite !== 'None.'
 }
 
+// Parses "Mastery of the X talent." and "Mastery of the X or Y talent." (case-insensitive).
+// Returns candidate talent names, or null for narrative/unparseable prereqs.
+function parseMasteryPrereq(prereq: string): string[] | null {
+  const m = prereq.match(/^Mastery of the (.+?) talent[.,]?/i)
+  if (!m) return null
+  return m[1].split(/\s+or\s+/i).map((s) => s.trim())
+}
+
+function isPrereqSatisfied(prereq: string): boolean {
+  const candidates = parseMasteryPrereq(prereq)
+  if (!candidates) return false
+  // Starting talent is always Novice — only slots at Master tier can satisfy a Mastery prereq.
+  // Normalize case because talent names in data are UPPERCASE but prereq strings use Title Case.
+  const mastered = new Set(
+    props.slots
+      .filter((s): s is TalentSlot => !!s && s.tier === 'Master')
+      .map((s) => s.name.toUpperCase()),
+  )
+  return candidates.some((name) => mastered.has(name.toUpperCase()))
+}
+
 /** Can the player afford to set slot[slotIndex] to the given tier? */
 function canAffordTier(slotIndex: number, tier: MasteryTier): boolean {
   const slot = props.slots[slotIndex]
@@ -73,7 +94,7 @@ function setTier(index: number, tier: MasteryTier) {
 }
 
 function talentLabel(t: Talent): string {
-  if (hasPrerequisite(t)) {
+  if (hasPrerequisite(t) && !isPrereqSatisfied(t.prerequisite!)) {
     return `\u{1F512} ${t.name} (Req: ${t.prerequisite})`
   }
   return t.name
@@ -145,8 +166,12 @@ function talentLabel(t: Talent): string {
           {{ getTalent(slot.name)![slot.tier.toLowerCase() as 'novice' | 'skilled' | 'expert' | 'master'] }}
         </div>
 
-        <div v-if="slot && getTalent(slot.name)?.prerequisite && getTalent(slot.name)!.prerequisite !== 'None.'" class="text-xs text-amber-600 mt-1">
-          Prerequisite: {{ getTalent(slot.name)!.prerequisite }}
+        <div
+          v-if="slot && getTalent(slot.name)?.prerequisite && getTalent(slot.name)!.prerequisite !== 'None.'"
+          class="text-xs mt-1"
+          :class="isPrereqSatisfied(getTalent(slot.name)!.prerequisite) ? 'text-emerald-600' : 'text-amber-600'"
+        >
+          {{ isPrereqSatisfied(getTalent(slot.name)!.prerequisite) ? '✓ ' : '' }}Prerequisite: {{ getTalent(slot.name)!.prerequisite }}
         </div>
       </div>
     </div>
