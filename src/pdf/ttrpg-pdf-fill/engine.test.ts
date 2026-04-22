@@ -108,35 +108,91 @@ describe('fillCharacterSheet — auto-wrap', () => {
 
 // --- Latin-1 sanitization ---
 
-describe('fillCharacterSheet — Latin-1 sanitization', () => {
-  it('throws EncodingError for em-dash (U+2014)', async () => {
+describe('fillCharacterSheet — smart punctuation normalization', () => {
+  it('em-dash (U+2014) normalizes to hyphen', async () => {
+    const template = await makeSyntheticPdf([{ kind: 'text', name: 'NAME' }])
+    const filled = await fillCharacterSheet({
+      templateBytes: template,
+      mapping: () => ({ NAME: 'Name — with em dash' }),
+      state: {},
+    })
+    expect(await readTextField(filled, 'NAME')).toBe('Name - with em dash')
+  })
+
+  it('curly apostrophe (U+2019) normalizes to straight apostrophe', async () => {
+    const template = await makeSyntheticPdf([{ kind: 'text', name: 'NAME' }])
+    const filled = await fillCharacterSheet({
+      templateBytes: template,
+      mapping: () => ({ NAME: "D’Artagnan" }),
+      state: {},
+    })
+    expect(await readTextField(filled, 'NAME')).toBe("D'Artagnan")
+  })
+
+  it('curly double quotes (U+201C / U+201D) normalize to straight quotes', async () => {
+    const template = await makeSyntheticPdf([
+      { kind: 'text', name: 'Inventory', multiline: true },
+    ])
+    const filled = await fillCharacterSheet({
+      templateBytes: template,
+      mapping: () => ({ Inventory: 'He said “hello” and walked off.' }),
+      state: {},
+    })
+    expect(await readTextField(filled, 'Inventory')).toBe(
+      'He said "hello" and walked off.',
+    )
+  })
+
+  it('ellipsis (U+2026) normalizes to three dots', async () => {
+    const template = await makeSyntheticPdf([{ kind: 'text', name: 'F' }])
+    const filled = await fillCharacterSheet({
+      templateBytes: template,
+      mapping: () => ({ F: 'wait…' }),
+      state: {},
+    })
+    expect(await readTextField(filled, 'F')).toBe('wait...')
+  })
+
+  it('en-dash (U+2013) normalizes to hyphen', async () => {
+    const template = await makeSyntheticPdf([{ kind: 'text', name: 'F' }])
+    const filled = await fillCharacterSheet({
+      templateBytes: template,
+      mapping: () => ({ F: 'range 5–10' }),
+      state: {},
+    })
+    expect(await readTextField(filled, 'F')).toBe('range 5-10')
+  })
+
+  it('still throws EncodingError for truly unsupported chars (e.g. CJK)', async () => {
     const template = await makeSyntheticPdf([{ kind: 'text', name: 'NAME' }])
     await expect(
       fillCharacterSheet({
         templateBytes: template,
-        mapping: () => ({ NAME: 'Name — with em dash' }),
+        mapping: () => ({ NAME: '田中' }),
         state: {},
       }),
     ).rejects.toThrow(EncodingError)
   })
 
-  it('throws EncodingError for curly apostrophe (U+2019)', async () => {
+  it('still throws EncodingError for emoji', async () => {
     const template = await makeSyntheticPdf([{ kind: 'text', name: 'NAME' }])
     await expect(
       fillCharacterSheet({
         templateBytes: template,
-        mapping: () => ({ NAME: "D’Artagnan" }),
+        mapping: () => ({ NAME: 'Rocky 🥊' }),
         state: {},
       }),
     ).rejects.toThrow(EncodingError)
   })
 
-  it('names the offending field in the error', async () => {
-    const template = await makeSyntheticPdf([{ kind: 'text', name: 'INVENTORY' }])
+  it('names the offending field in encoding errors', async () => {
+    const template = await makeSyntheticPdf([
+      { kind: 'text', name: 'INVENTORY' },
+    ])
     try {
       await fillCharacterSheet({
         templateBytes: template,
-        mapping: () => ({ INVENTORY: 'bad — char' }),
+        mapping: () => ({ INVENTORY: 'bad 漢字 char' }),
         state: {},
       })
       expect.fail('should have thrown')
@@ -147,7 +203,7 @@ describe('fillCharacterSheet — Latin-1 sanitization', () => {
     }
   })
 
-  it('accepts accented Latin-1 (U+00E9 é)', async () => {
+  it('accepts accented Latin-1 (U+00E9 é) unchanged', async () => {
     const template = await makeSyntheticPdf([{ kind: 'text', name: 'NAME' }])
     const filled = await fillCharacterSheet({
       templateBytes: template,

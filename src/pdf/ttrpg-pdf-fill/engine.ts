@@ -92,6 +92,35 @@ function resolveAlias(key: string, aliases?: Record<string, string>): string {
   return aliases?.[key] ?? key
 }
 
+/**
+ * Common smart-punctuation → ASCII normalizations. Applied before the strict
+ * WinAnsi check so that content copy-pasted from Word/Discord/Notion (which
+ * auto-convert straight punctuation to curly) doesn't fail export. Lossy but
+ * widely acceptable — preserves meaning, sacrifices typography.
+ */
+const SMART_PUNCTUATION: Record<string, string> = {
+  '‘': "'", // left single quote
+  '’': "'", // right single quote / apostrophe
+  '‚': ',', // single low-9 quote
+  '‛': "'", // single high-reversed quote
+  '“': '"', // left double quote
+  '”': '"', // right double quote
+  '„': '"', // double low-9 quote
+  '‟': '"', // double high-reversed quote
+  '–': '-', // en dash
+  '—': '-', // em dash
+  '―': '-', // horizontal bar
+  '…': '...', // ellipsis
+  '•': '*', // bullet
+  ' ': ' ', // non-breaking space (Latin-1 but normalize for consistency)
+}
+
+const SMART_PUNCTUATION_RE = /[ –—―‘-‟•…]/g
+
+function normalizeSmartPunctuation(value: string): string {
+  return value.replace(SMART_PUNCTUATION_RE, (ch) => SMART_PUNCTUATION[ch] ?? ch)
+}
+
 function assertWinAnsi(value: string, fieldName: string): void {
   for (const ch of value) {
     const cp = ch.codePointAt(0)!
@@ -141,7 +170,11 @@ export async function fillCharacterSheet<State>(
     }
 
     if (normalized.kind === 'text') {
-      assertWinAnsi(normalized.value, key)
+      // Normalize smart punctuation (curly quotes, em-dashes, ellipsis, etc.)
+      // BEFORE the WinAnsi check. This is what most real-world content needs;
+      // the strict check remains as a backstop for truly unsupported chars.
+      const sanitized = normalizeSmartPunctuation(normalized.value)
+      assertWinAnsi(sanitized, key)
       // pdf-lib's form field types are unions; cast to access setText
       const tf = field as unknown as {
         setText: (v: string) => void
@@ -150,7 +183,7 @@ export async function fillCharacterSheet<State>(
         setAlignment: (a: number) => void
         setFontSize: (s: number) => void
       }
-      tf.setText(normalized.value)
+      tf.setText(sanitized)
 
       const override = fieldOverrides?.[key]
       if (override) {
