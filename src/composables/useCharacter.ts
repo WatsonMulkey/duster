@@ -20,6 +20,19 @@ const XP_COST_OTHER: Record<MasteryTier, number> = {
   Master: 6,
 }
 
+/**
+ * Starting-talent XP cost ladder — discounted compared to additional talents.
+ * Derived from Google Sheet formula: IFS(C34="Novice",0,"Skilled",1,"Expert",2,"Master",4).
+ * A level-1 character (3 XP) can promote their starting talent to Skilled (1 XP)
+ * or Expert (2 XP), but Master (4 XP) needs level 2+.
+ */
+const XP_COST_STARTING: Record<MasteryTier, number> = {
+  Novice: 0,
+  Skilled: 1,
+  Expert: 2,
+  Master: 4,
+}
+
 export function useCharacter() {
   const state = reactive<CharacterState>({
     name: '',
@@ -27,6 +40,7 @@ export function useCharacter() {
     keenSkill: null,
     selectedGiftIndex: 0,
     startingTalent: null,
+    startingTalentTier: 'Novice',
     talents: [null, null, null],
     weapons: [],
     startingItems: [],
@@ -94,12 +108,11 @@ export function useCharacter() {
 
   const xpSpent = computed(() => {
     let spent = 0
-    // Skill 1 = starting talent (index 0 in the talent slots, but it's separate)
+    // Skill 1 = starting talent, using the discounted starting-talent ladder.
     if (state.startingTalent) {
-      // Starting talent is always at Novice for new characters (level 1)
-      // No XP cost for Novice on Skill 1
+      spent += XP_COST_STARTING[state.startingTalentTier]
     }
-    // Skills 2-4 = the three additional talent slots
+    // Skills 2-4 = the three additional talent slots, using the standard ladder.
     for (const slot of state.talents) {
       if (slot) {
         spent += XP_COST_OTHER[slot.tier]
@@ -130,6 +143,7 @@ export function useCharacter() {
     state.keenSkill = null
     state.selectedGiftIndex = 0
     state.startingTalent = null
+    state.startingTalentTier = 'Novice'
     state.talents = [null, null, null]
     state.startingItems = []
   }
@@ -140,6 +154,7 @@ export function useCharacter() {
     state.keenSkill = null
     state.selectedGiftIndex = 0
     state.startingTalent = null
+    state.startingTalentTier = 'Novice'
     state.talents = [null, null, null]
     state.weapons = []
     state.startingItems = []

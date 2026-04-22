@@ -128,8 +128,8 @@ export const dusterMapping: FieldMapping<CharacterState> = (state) => {
     out[boxName] = state.keenSkill === skill
   }
 
-  // Talent grid row 1 = starting talent (always Novice tier for new chars)
-  const row1 = computeTalentRow(state.startingTalent, 'Novice')
+  // Talent grid row 1 = starting talent, using player-chosen tier
+  const row1 = computeTalentRow(state.startingTalent, state.startingTalentTier)
   out['Name/Novice 1'] = row1.novice
   out['Skilled 1'] = row1.skilled
   out['Expert 1'] = row1.expert

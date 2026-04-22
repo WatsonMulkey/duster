@@ -15,9 +15,18 @@ const XP_COST: Record<MasteryTier, number> = {
   Master: 6,
 }
 
+/** Discounted XP ladder for advancing the specialty-given starting talent. */
+const XP_COST_STARTING: Record<MasteryTier, number> = {
+  Novice: 0,
+  Skilled: 1,
+  Expert: 2,
+  Master: 4,
+}
+
 const props = defineProps<{
   slots: (TalentSlot | null)[]
   startingTalent: string | null
+  startingTalentTier: MasteryTier
   xpRemaining: number
   xpTotal: number
   level: number
@@ -26,6 +35,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   update: [index: number, slot: TalentSlot | null]
   'update:level': [level: number]
+  'update:startingTalentTier': [tier: MasteryTier]
 }>()
 
 const tiers: MasteryTier[] = ['Novice', 'Skilled', 'Expert', 'Master']
@@ -53,6 +63,19 @@ function canAffordTier(slotIndex: number, tier: MasteryTier): boolean {
   const currentCost = slot ? XP_COST[slot.tier] : 0
   const newCost = XP_COST[tier]
   return (props.xpRemaining + currentCost - newCost) >= 0
+}
+
+/** Can the player afford to advance the starting talent to `tier`? */
+function canAffordStartingTier(tier: MasteryTier): boolean {
+  const currentCost = XP_COST_STARTING[props.startingTalentTier]
+  const newCost = XP_COST_STARTING[tier]
+  return (props.xpRemaining + currentCost - newCost) >= 0
+}
+
+function setStartingTier(tier: MasteryTier) {
+  if (canAffordStartingTier(tier)) {
+    emit('update:startingTalentTier', tier)
+  }
 }
 
 /** Can this empty slot afford at least a Novice talent? */
@@ -113,9 +136,37 @@ function talentLabel(t: Talent): string {
 
     <div v-if="startingTalent && getTalent(startingTalent)" class="max-w-xl mb-4">
       <div class="p-4 rounded-lg bg-black text-white">
-        <div class="font-bold">{{ startingTalent }}</div>
-        <div class="text-sm mt-1 opacity-85">
-          {{ getTalent(startingTalent)!.novice }}
+        <div class="flex items-start justify-between gap-3 mb-2">
+          <div>
+            <div class="text-[10pt] uppercase tracking-wider opacity-60 mb-0.5">Starting Talent</div>
+            <div class="font-bold">{{ startingTalent }}</div>
+          </div>
+        </div>
+
+        <!-- Tier buttons for starting talent — discounted XP ladder (0/1/2/4) -->
+        <div class="flex gap-2 flex-wrap mb-2">
+          <button
+            v-for="tier in tiers"
+            :key="tier"
+            @click="setStartingTier(tier)"
+            :disabled="!canAffordStartingTier(tier)"
+            class="px-3 py-1 text-xs border rounded transition-all"
+            :class="[
+              startingTalentTier === tier
+                ? 'bg-white text-black border-white'
+                : canAffordStartingTier(tier)
+                  ? 'border-gray-500 hover:border-white'
+                  : 'border-gray-700 text-gray-500 cursor-not-allowed',
+            ]"
+          >
+            {{ tier }} <span class="opacity-60">({{ XP_COST_STARTING[tier] }})</span>
+          </button>
+        </div>
+
+        <!-- Description text for the current tier -->
+        <div class="text-sm opacity-85">
+          <span class="font-semibold">{{ startingTalentTier }}:</span>
+          {{ getTalent(startingTalent)![startingTalentTier.toLowerCase() as 'novice' | 'skilled' | 'expert' | 'master'] }}
         </div>
       </div>
     </div>

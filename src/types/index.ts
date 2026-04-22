@@ -60,6 +60,8 @@ export interface CharacterState {
   keenSkill: Skill | null
   selectedGiftIndex: 0 | 1
   startingTalent: string | null
+  /** Tier the starting talent has been advanced to. Default 'Novice'. */
+  startingTalentTier: MasteryTier
   talents: (TalentSlot | null)[]
   weapons: WeaponSlot[]
   startingItems: StartingItem[]

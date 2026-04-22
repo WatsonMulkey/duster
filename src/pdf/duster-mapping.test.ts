@@ -143,6 +143,20 @@ describe('dusterMapping — talent grid', () => {
     expect(out['Master 1']).toBe('')
   })
 
+  it('Skilled 1 populated when startingTalentTier is Skilled', () => {
+    const out = dusterMapping({ ...happy, startingTalentTier: 'Skilled' })
+    expect(out['Skilled 1']).toBeTruthy()
+    expect(out['Expert 1']).toBe('')
+    expect(out['Master 1']).toBe('')
+  })
+
+  it('All tier columns populated when startingTalentTier is Master', () => {
+    const out = dusterMapping({ ...happy, startingTalentTier: 'Master' })
+    expect(out['Skilled 1']).toBeTruthy()
+    expect(out['Expert 1']).toBeTruthy()
+    expect(out['Master 1']).toBeTruthy()
+  })
+
   it('Skilled 2 populated when talents[0] is at Skilled tier', () => {
     const state: CharacterState = {
       ...happy,

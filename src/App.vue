@@ -12,7 +12,7 @@ import CharacterSheet from './components/CharacterSheet.vue'
 import Toast from './components/Toast.vue'
 import { useExportPdf } from './composables/useExportPdf'
 import { specialtyTables } from './data/startingItems'
-import type { Skill, Hand, TalentSlot, StartingItem } from './types'
+import type { Skill, Hand, TalentSlot, StartingItem, MasteryTier } from './types'
 
 // Password gate for preview deployments (client-side only, not real security)
 const previewPassword = 'dusty2026'
@@ -251,11 +251,13 @@ function updateStartingItems(items: StartingItem[]) {
         v-if="currentStep === 4"
         :slots="state.talents"
         :starting-talent="state.startingTalent"
+        :starting-talent-tier="state.startingTalentTier"
         :xp-remaining="xpRemaining"
         :xp-total="xpTotal"
         :level="state.level"
         @update="updateTalent"
         @update:level="(l: number) => state.level = l"
+        @update:starting-talent-tier="(t: MasteryTier) => state.startingTalentTier = t"
       />
       <StartingItemsStep
         v-if="currentStep === 5"
