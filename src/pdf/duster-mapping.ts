@@ -6,7 +6,7 @@ import type {
 } from '../types'
 import { specialties } from '../data/specialties'
 import { talents } from '../data/talents'
-import type { FieldMapping, FieldValue } from './ttrpg-pdf-fill'
+import type { FieldMapping, FieldValue } from './ttrpg-pdf-fill/engine'
 
 /**
  * Maps a CharacterState to the 39 app-fill values in Mac_Sheet.pdf.

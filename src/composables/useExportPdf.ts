@@ -12,8 +12,10 @@ const TEMPLATE_URL = '/templates/character-sheet.pdf'
 export async function exportCharacterPdf(
   state: CharacterState,
 ): Promise<Uint8Array> {
-  // Dynamic imports — deferred until button click
-  const { fillCharacterSheet } = await import('../pdf/ttrpg-pdf-fill')
+  // Dynamic imports — deferred until button click.
+  // Import engine directly (not index) so the vite-plugin (which uses node:fs)
+  // doesn't get dragged into the browser bundle.
+  const { fillCharacterSheet } = await import('../pdf/ttrpg-pdf-fill/engine')
   const { dusterMapping } = await import('../pdf/duster-mapping')
   const { dusterOverrides } = await import('../pdf/duster-overrides')
   const { dusterAliases } = await import('../pdf/duster-aliases')

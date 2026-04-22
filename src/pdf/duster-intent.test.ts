@@ -3,7 +3,7 @@ import { PDFDocument } from 'pdf-lib'
 import { readFileSync } from 'node:fs'
 import { dusterIntent } from './duster-intent'
 import { dusterAliases } from './duster-aliases'
-import type { FieldIntent } from './ttrpg-pdf-fill'
+import type { FieldIntent } from './ttrpg-pdf-fill/engine'
 
 describe('dusterIntent', () => {
   it('has exactly 81 entries', () => {

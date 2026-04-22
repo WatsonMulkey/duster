@@ -26,11 +26,13 @@ Derived from your MAIN PAGE sheet which has `Current HP` and `Max HP` rows that 
 
 ## 3. `RESOURCE` and `GHOST HAND`
 
-**Proposal**: both stay **blank** at character creation. Player writes in during play if the mechanic applies.
+**Proposal**: both stay as-is from the template — we don't write anything to them. Player writes during play if the mechanic applies.
 
-Derived from: Rambler and Brawler samples showed both blank; Ren (a Driver) had `GHOST HAND = 1` — so it's a gameplay tracker that accumulates during play, not a starting value.
+What that means in practice with your current template:
+- **RESOURCE** ships blank (the template default is empty).
+- **GHOST HAND** ships with `"4"` because that's what the template's default value is set to. We're not overwriting it on export.
 
-**Confirm?** (If there IS a starting value for specific specialties — Teke, Stitch, etc. — let me know what and I'll wire it up.)
+**Confirm?** If the "4" default on GHOST HAND is meant to be a universal starting value (great, no change needed), or if it should be blank / specialty-specific (then change the template default in InDesign, and we'll verify the next build passes). If there IS a starting value for specific specialties — Teke, Stitch, etc. — let me know what and I'll wire it up to compute it from character state.
 
 ---
 

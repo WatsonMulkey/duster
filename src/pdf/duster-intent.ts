@@ -1,4 +1,4 @@
-import type { FieldIntents } from './ttrpg-pdf-fill'
+import type { FieldIntents } from './ttrpg-pdf-fill/engine'
 
 /**
  * Classification for all 81 fields of Mac_Sheet.pdf.

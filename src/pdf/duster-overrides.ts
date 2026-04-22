@@ -1,4 +1,4 @@
-import type { FieldOverrides } from './ttrpg-pdf-fill'
+import type { FieldOverrides } from './ttrpg-pdf-fill/engine'
 
 /**
  * Template bug workarounds for Mac_Sheet.pdf.
