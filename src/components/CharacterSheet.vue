@@ -88,15 +88,21 @@ const allTalentRows = [
       <!-- Left: Stats -->
       <div class="flex-1 space-y-2">
         <!-- HP / Stress -->
-        <div class="flex items-center gap-4">
-          <div class="flex items-center gap-1">
-            <span class="font-bold text-sm">HP</span>
-            <span class="border border-black px-1 text-xs">{{ hp }}<sub class="text-[6pt]">OW</sub></span>
-            <span class="border border-black px-1 text-xs">{{ hp }}<sub class="text-[6pt]">TAL</sub></span>
+        <div class="flex items-end gap-4">
+          <div class="flex items-end gap-2">
+            <span class="font-bold text-sm pb-1">HP</span>
+            <div class="flex flex-col items-center">
+              <span class="text-[7pt] text-gray-600 leading-none">Now</span>
+              <span class="border border-black px-2 py-0.5 text-xs font-semibold min-w-[1.75rem] text-center">{{ hp }}</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <span class="text-[7pt] text-gray-600 leading-none">Total</span>
+              <span class="border border-black px-2 py-0.5 text-xs font-semibold min-w-[1.75rem] text-center">{{ hp }}</span>
+            </div>
           </div>
-          <div class="flex items-center gap-1">
-            <span class="font-bold text-sm">STRESS</span>
-            <span v-for="i in 4" :key="i" class="w-4 h-4 border border-black inline-block"></span>
+          <div class="flex items-end gap-1">
+            <span class="font-bold text-sm pb-1">STRESS</span>
+            <span v-for="i in 4" :key="i" class="w-4 h-4 border border-black inline-block mb-0.5"></span>
           </div>
         </div>
 
