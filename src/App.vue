@@ -11,6 +11,7 @@ import InventoryStep from './components/wizard/InventoryStep.vue'
 import CharacterSheet from './components/CharacterSheet.vue'
 import Toast from './components/Toast.vue'
 import { useExportPdf } from './composables/useExportPdf'
+import { toasts } from './composables/useToast'
 import { specialtyTables } from './data/startingItems'
 import type { Skill, Hand, TalentSlot, StartingItem, MasteryTier } from './types'
 
@@ -110,6 +111,8 @@ function startOver() {
   reset()
   currentStep.value = 0
   showSheet.value = false
+  // Clear any lingering toasts (e.g. an export error toast from before reset)
+  toasts.value = []
 }
 
 function updateTalent(index: number, slot: TalentSlot | null) {

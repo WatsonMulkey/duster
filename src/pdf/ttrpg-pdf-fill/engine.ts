@@ -93,47 +93,38 @@ function resolveAlias(key: string, aliases?: Record<string, string>): string {
 }
 
 /**
- * Common smart-punctuation → ASCII normalizations. Applied before the strict
- * WinAnsi check so that content copy-pasted from Word/Discord/Notion (which
- * auto-convert straight punctuation to curly) doesn't fail export. Lossy but
- * widely acceptable — preserves meaning, sacrifices typography.
+ * WinAnsi (CP1252) covers three ranges:
+ *   - 0x20-0x7E: ASCII printable
+ *   - 0xA0-0xFF: Latin-1 supplement
+ *   - 0x80-0x9F gap: a curated set of General Punctuation + symbols mapped in by CP1252
+ *
+ * That gap is where smart punctuation lives. WinAnsi 0x91 = U+2018 (left single
+ * quote), 0x92 = U+2019 (right single quote), 0x93/0x94 = U+201C/D (curly double
+ * quotes), 0x96/0x97 = U+2013/2014 (en/em dash), 0x85 = U+2026 (ellipsis), etc.
+ *
+ * These ARE representable in pdf-lib's default Helvetica + WinAnsi encoding —
+ * no need to normalize to ASCII.
  */
-const SMART_PUNCTUATION: Record<string, string> = {
-  '‘': "'", // left single quote
-  '’': "'", // right single quote / apostrophe
-  '‚': ',', // single low-9 quote
-  '‛': "'", // single high-reversed quote
-  '“': '"', // left double quote
-  '”': '"', // right double quote
-  '„': '"', // double low-9 quote
-  '‟': '"', // double high-reversed quote
-  '–': '-', // en dash
-  '—': '-', // em dash
-  '―': '-', // horizontal bar
-  '…': '...', // ellipsis
-  '•': '*', // bullet
-  ' ': ' ', // non-breaking space (Latin-1 but normalize for consistency)
-}
-
-const SMART_PUNCTUATION_RE = /[ –—―‘-‟•…]/g
-
-function normalizeSmartPunctuation(value: string): string {
-  return value.replace(SMART_PUNCTUATION_RE, (ch) => SMART_PUNCTUATION[ch] ?? ch)
-}
+const WINANSI_EXTRA_CODEPOINTS = new Set<number>([
+  0x20ac, 0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021, 0x02c6,
+  0x2030, 0x0160, 0x2039, 0x0152, 0x017d, 0x2018, 0x2019, 0x201c,
+  0x201d, 0x2022, 0x2013, 0x2014, 0x02dc, 0x2122, 0x0161, 0x203a,
+  0x0153, 0x017e, 0x0178,
+])
 
 function assertWinAnsi(value: string, fieldName: string): void {
   for (const ch of value) {
     const cp = ch.codePointAt(0)!
-    // WinAnsi: 0x20-0x7E (ASCII printable) + 0xA0-0xFF (Latin-1 supplement)
-    // Also allow common whitespace: \n (0x0A), \r (0x0D), \t (0x09)
     const isWhitespace = cp === 0x09 || cp === 0x0a || cp === 0x0d
     const isAscii = cp >= 0x20 && cp <= 0x7e
     const isLatin1 = cp >= 0xa0 && cp <= 0xff
-    if (!isWhitespace && !isAscii && !isLatin1) {
+    const isWinAnsiExtra = WINANSI_EXTRA_CODEPOINTS.has(cp)
+    if (!isWhitespace && !isAscii && !isLatin1 && !isWinAnsiExtra) {
       throw new EncodingError(
         `Field "${fieldName}" contains non-WinAnsi character "${ch}" ` +
           `(U+${cp.toString(16).toUpperCase().padStart(4, '0')}). ` +
-          `v1 limitation — UTF-8 font embedding is deferred. Replace or remove the character.`,
+          `pdf-lib's default Helvetica font doesn't support it. ` +
+          `Replace/remove the character, or embed a UTF-8 font (deferred to v2).`,
         fieldName,
       )
     }
@@ -170,11 +161,10 @@ export async function fillCharacterSheet<State>(
     }
 
     if (normalized.kind === 'text') {
-      // Normalize smart punctuation (curly quotes, em-dashes, ellipsis, etc.)
-      // BEFORE the WinAnsi check. This is what most real-world content needs;
-      // the strict check remains as a backstop for truly unsupported chars.
-      const sanitized = normalizeSmartPunctuation(normalized.value)
-      assertWinAnsi(sanitized, key)
+      // Strict WinAnsi check (including smart punctuation in the 0x80-0x9F gap).
+      // Pass through as-is — pdf-lib's Helvetica + WinAnsi encoding handles
+      // curly quotes, em-dashes, ellipsis, etc. natively.
+      assertWinAnsi(normalized.value, key)
       // pdf-lib's form field types are unions; cast to access setText
       const tf = field as unknown as {
         setText: (v: string) => void
@@ -183,7 +173,7 @@ export async function fillCharacterSheet<State>(
         setAlignment: (a: number) => void
         setFontSize: (s: number) => void
       }
-      tf.setText(sanitized)
+      tf.setText(normalized.value)
 
       const override = fieldOverrides?.[key]
       if (override) {

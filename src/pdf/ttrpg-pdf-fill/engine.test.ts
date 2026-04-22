@@ -108,28 +108,31 @@ describe('fillCharacterSheet — auto-wrap', () => {
 
 // --- Latin-1 sanitization ---
 
-describe('fillCharacterSheet — smart punctuation normalization', () => {
-  it('em-dash (U+2014) normalizes to hyphen', async () => {
+describe('fillCharacterSheet — WinAnsi smart-punctuation pass-through', () => {
+  // WinAnsi (CP1252) includes smart punctuation in the 0x80-0x9F range.
+  // These chars pass through unchanged — pdf-lib's Helvetica handles them.
+
+  it('em-dash (U+2014, WinAnsi 0x97) passes through unchanged', async () => {
     const template = await makeSyntheticPdf([{ kind: 'text', name: 'NAME' }])
     const filled = await fillCharacterSheet({
       templateBytes: template,
       mapping: () => ({ NAME: 'Name — with em dash' }),
       state: {},
     })
-    expect(await readTextField(filled, 'NAME')).toBe('Name - with em dash')
+    expect(await readTextField(filled, 'NAME')).toBe('Name — with em dash')
   })
 
-  it('curly apostrophe (U+2019) normalizes to straight apostrophe', async () => {
+  it('curly apostrophe (U+2019, WinAnsi 0x92) passes through unchanged', async () => {
     const template = await makeSyntheticPdf([{ kind: 'text', name: 'NAME' }])
     const filled = await fillCharacterSheet({
       templateBytes: template,
       mapping: () => ({ NAME: "D’Artagnan" }),
       state: {},
     })
-    expect(await readTextField(filled, 'NAME')).toBe("D'Artagnan")
+    expect(await readTextField(filled, 'NAME')).toBe("D’Artagnan")
   })
 
-  it('curly double quotes (U+201C / U+201D) normalize to straight quotes', async () => {
+  it('curly double quotes (U+201C/D, WinAnsi 0x93/94) pass through', async () => {
     const template = await makeSyntheticPdf([
       { kind: 'text', name: 'Inventory', multiline: true },
     ])
@@ -139,28 +142,38 @@ describe('fillCharacterSheet — smart punctuation normalization', () => {
       state: {},
     })
     expect(await readTextField(filled, 'Inventory')).toBe(
-      'He said "hello" and walked off.',
+      'He said “hello” and walked off.',
     )
   })
 
-  it('ellipsis (U+2026) normalizes to three dots', async () => {
+  it('ellipsis (U+2026, WinAnsi 0x85) passes through unchanged', async () => {
     const template = await makeSyntheticPdf([{ kind: 'text', name: 'F' }])
     const filled = await fillCharacterSheet({
       templateBytes: template,
       mapping: () => ({ F: 'wait…' }),
       state: {},
     })
-    expect(await readTextField(filled, 'F')).toBe('wait...')
+    expect(await readTextField(filled, 'F')).toBe('wait…')
   })
 
-  it('en-dash (U+2013) normalizes to hyphen', async () => {
+  it('en-dash (U+2013, WinAnsi 0x96) passes through unchanged', async () => {
     const template = await makeSyntheticPdf([{ kind: 'text', name: 'F' }])
     const filled = await fillCharacterSheet({
       templateBytes: template,
       mapping: () => ({ F: 'range 5–10' }),
       state: {},
     })
-    expect(await readTextField(filled, 'F')).toBe('range 5-10')
+    expect(await readTextField(filled, 'F')).toBe('range 5–10')
+  })
+
+  it('euro sign (U+20AC, WinAnsi 0x80) passes through unchanged', async () => {
+    const template = await makeSyntheticPdf([{ kind: 'text', name: 'F' }])
+    const filled = await fillCharacterSheet({
+      templateBytes: template,
+      mapping: () => ({ F: '€100' }),
+      state: {},
+    })
+    expect(await readTextField(filled, 'F')).toBe('€100')
   })
 
   it('still throws EncodingError for truly unsupported chars (e.g. CJK)', async () => {

@@ -86,7 +86,7 @@ const allTalentRows = [
     </div>
 
     <!-- STATS ROW + BODY GRID -->
-    <div class="flex gap-4 mb-3">
+    <div class="flex gap-4 mb-6">
       <!-- Left: Stats -->
       <div class="flex-1 space-y-2">
         <!-- HP / Stress -->
