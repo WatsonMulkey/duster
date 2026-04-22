@@ -9,6 +9,7 @@ import TalentsStep from './components/wizard/TalentsStep.vue'
 import StartingItemsStep from './components/wizard/StartingItemsStep.vue'
 import InventoryStep from './components/wizard/InventoryStep.vue'
 import CharacterSheet from './components/CharacterSheet.vue'
+import Toast from './components/Toast.vue'
 import type { Skill, Hand, TalentSlot, StartingItem } from './types'
 
 // Password gate for preview deployments (client-side only, not real security)
@@ -266,4 +267,5 @@ function updateStartingItems(items: StartingItem[]) {
       </div>
     </footer>
   </div>
+  <Toast />
 </template>
