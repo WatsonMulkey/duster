@@ -15,4 +15,6 @@ export type {
   FillCharacterSheetOptions,
 } from './engine'
 
-// vite-plugin exports added in FOI-195
+export { createMappingCheckPlugin, runMappingCheck } from './vite-plugin'
+
+export type { MappingCheckConfig, CheckResult } from './vite-plugin'
