@@ -136,7 +136,7 @@ const allTalentRows = [
       </div>
 
       <!-- Right: Body Grid (matches Mac_Sheet.pdf layout) -->
-      <div class="shrink-0 flex items-stretch">
+      <div class="shrink-0 self-start flex items-stretch">
         <div class="flex items-center bg-black text-white px-1 font-bold text-xs" style="writing-mode: vertical-rl; transform: rotate(180deg);">
           BODY
         </div>
