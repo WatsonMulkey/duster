@@ -14,6 +14,7 @@ const props = defineProps<{
   statBoost: EnergyGroup | null
   keenSkill: Skill | null
   startingTalent: string | null
+  startingTalentTier: MasteryTier
   talentSlots: (TalentSlot | null)[]
   weaponSlots: WeaponSlot[]
   startingItems: StartingItem[]
@@ -39,7 +40,9 @@ function getTalentTierText(name: string, tier: string): string {
 }
 
 const allTalentRows = [
-  props.startingTalent ? { name: props.startingTalent, tier: 'Novice' as MasteryTier } : null,
+  props.startingTalent
+    ? { name: props.startingTalent, tier: props.startingTalentTier }
+    : null,
   ...props.talentSlots,
 ]
 </script>
@@ -166,7 +169,7 @@ const allTalentRows = [
     <!-- ENERGY / SKILLS + INVENTORY / WEAPONS -->
     <div class="flex gap-4 mb-3">
       <!-- Left: Energy groups -->
-      <div class="flex-1 space-y-3">
+      <div class="flex-1 min-w-0 space-y-3">
         <div v-for="group in energyGroups" :key="group.name">
           <div class="flex items-center gap-2 mb-1">
             <span class="border border-black w-6 h-5 inline-flex items-center justify-center text-[8pt] font-bold">
@@ -186,18 +189,18 @@ const allTalentRows = [
       </div>
 
       <!-- Right: Inventory + Weapons -->
-      <div class="flex-1 space-y-3">
+      <div class="flex-1 min-w-0 space-y-3">
         <!-- Inventory -->
         <div>
           <div class="bg-black text-white font-bold text-sm px-2 py-1 mb-1">INVENTORY</div>
-          <div class="border border-black p-2 min-h-[80px] text-[8pt] whitespace-pre-wrap">{{ inventory || '\u00A0' }}</div>
+          <div class="border border-black p-2 min-h-[80px] text-[8pt] whitespace-pre-wrap break-all overflow-hidden">{{ inventory || '\u00A0' }}</div>
         </div>
 
         <!-- Starting Items -->
         <div>
           <div class="bg-black text-white font-bold text-sm px-2 py-1 mb-1">STARTING ITEMS</div>
-          <ul class="text-[8pt] space-y-0.5 pl-1">
-            <li v-for="(item, idx) in startingItems" :key="idx" class="py-0.5">
+          <ul class="text-[8pt] space-y-0.5 pl-1 overflow-hidden">
+            <li v-for="(item, idx) in startingItems" :key="idx" class="py-0.5 break-words">
               {{ item.name }}
             </li>
             <li v-if="startingItems.length === 0" class="py-0.5 text-gray-400">None</li>

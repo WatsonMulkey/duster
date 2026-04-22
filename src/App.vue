@@ -188,6 +188,7 @@ function updateStartingItems(items: StartingItem[]) {
         :stat-boost="statBoost"
         :keen-skill="state.keenSkill"
         :starting-talent="state.startingTalent"
+        :starting-talent-tier="state.startingTalentTier"
         :talent-slots="state.talents"
         :weapon-slots="state.weapons"
         :starting-items="state.startingItems"
