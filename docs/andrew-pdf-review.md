@@ -103,7 +103,27 @@ These are things I'd suggest you fix in the source `Mac_Sheet.pdf` when you next
 2. **`MENTAL`**, **`PHYSICAL`**, **`EMOTIONAL`** fields — currently multiline + top-left aligned; should be single-line centered (they only ever hold "+1").
 3. **`Stess 1`** typo — missing the `r` (should be `Stress 1`). We've got an alias in place so our code isn't affected, but cleanest to fix at source.
 4. **`Check Box 9`** — appears pre-checked in the base template. Probably accidental. We overwrite it on every export anyway, but cleaner to uncheck in source.
-5. **`Now` / `Total` labels** — the identifying text labels ("Now", "Total") sit **inside** the field rectangles rather than above/beside them. When we fill the fields with HP values, the labels get overwritten. Moving them outside the field rectangles (as separate text annotations) keeps them visible when the PDF is filled in.
+5. **`Now` / `Total` labels** — the identifying text labels ("Now", "Total") sit **inside** the field rectangles rather than above/beside them. When we fill the fields with HP values, the labels get overwritten. Moving them outside the field rectangles (as separate text annotations) keeps them visible when the PDF is filled in. (Until fixed, we're leaving these fields blank per §1 above.)
+
+---
+
+## 9. Talent grid cell size
+
+**Current behavior**: talent tier descriptions get **truncated** when they don't fit the fixed-height cells in the Talents grid.
+
+Example from a recent test export — a Slinger with GUNS (starting talent) and GAMBLER (additional talent) exported as:
+  - `GUNS / Pistolero: You are trained in` — truncated ("...in sixguns and other pistols." cut off)
+  - `GAMBLER / Snakebit Eyes: Before a dice` — truncated mid-sentence
+  - Skilled column: `Gambler's Edge:` — just the lead-in, no body
+
+**Proposal for v1**: ship as-is — the full text is visible in the web app, and most players will reference the digital sheet for rule lookups anyway. The PDF is a quick reference sheet.
+
+**Template-side fix options** (your call in a future InDesign pass):
+- Larger cell heights — more vertical room
+- Smaller font size — fits more per line
+- Auto-shrink text to fit (InDesign's "Shrink Text on Overflow" option on form fields)
+
+**Confirm?** — let me know if truncation is fine for v1, or if you want to adjust.
 
 ---
 
