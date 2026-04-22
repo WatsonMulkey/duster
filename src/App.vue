@@ -10,6 +10,7 @@ import StartingItemsStep from './components/wizard/StartingItemsStep.vue'
 import InventoryStep from './components/wizard/InventoryStep.vue'
 import CharacterSheet from './components/CharacterSheet.vue'
 import Toast from './components/Toast.vue'
+import { useExportPdf } from './composables/useExportPdf'
 import type { Skill, Hand, TalentSlot, StartingItem } from './types'
 
 // Password gate for preview deployments (client-side only, not real security)
@@ -96,6 +97,11 @@ function printSheet() {
   window.print()
 }
 
+const { exporting, handleExport } = useExportPdf()
+function exportFillablePdf() {
+  void handleExport(state)
+}
+
 function startOver() {
   reset()
   currentStep.value = 0
@@ -136,17 +142,28 @@ function updateStartingItems(items: StartingItem[]) {
   <!-- Character Sheet (print target) -->
   <div v-else-if="showSheet" class="min-h-screen bg-gray-100">
     <div class="max-w-4xl mx-auto py-4 px-4 print:hidden">
-      <div class="flex justify-between items-center mb-4">
+      <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
         <h1 class="text-xl font-bold">Character Sheet Preview</h1>
-        <div class="flex gap-2">
+        <div class="flex gap-2 flex-wrap">
           <button @click="startOver" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">
             Start Over
           </button>
-          <button @click="printSheet" class="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
-            Export PDF
+          <button @click="printSheet" class="px-4 py-2 border border-gray-400 rounded hover:bg-gray-50">
+            Print Sheet
+          </button>
+          <button
+            @click="exportFillablePdf"
+            :disabled="exporting"
+            aria-label="Export character sheet as fillable PDF"
+            class="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {{ exporting ? 'Generating…' : 'Export Fillable PDF' }}
           </button>
         </div>
       </div>
+      <p class="text-xs text-gray-500 text-right">
+        ℹ️ Open the fillable PDF in Adobe Reader for best results.
+      </p>
     </div>
 
     <div class="flex justify-center">
