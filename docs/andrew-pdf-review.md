@@ -8,11 +8,15 @@ Before I share the preview widely, I'd love your 5-minute sanity check on these 
 
 ## 1. `Now` / `Total` fields at the top
 
-**Proposal**: those are Current HP / Max HP, and we pre-fill both with **"12"** for a level-1 character.
+**Proposal**: we **leave these blank** (player writes current HP during play). Pending an InDesign template fix.
 
-Derived from your MAIN PAGE sheet which has `Current HP` and `Max HP` rows that match the positions of the Now/Total fields on the PDF.
+What's happening: those fields have the static text "NOW" and "TOTAL" baked into the field rectangles themselves as page content (not as placeholder text). When we try to write "12" into the fields, it visually overlaps the label and reads as `12OW` / `12TAL` — garbage.
 
-**Confirm?**
+**Template-side fix**: move the "NOW" and "TOTAL" text labels OUTSIDE the field rectangles (as separate text annotations ABOVE the boxes), same way every other label on the sheet works. Once fixed in InDesign, we flip these to auto-fill with `12` for a level-1 character and everything works.
+
+**Interim behavior**: the labels stay visible ("NOW" and "TOTAL" appear as designed in the unfilled boxes), but players write their HP value themselves during play.
+
+**Confirm?** (Alternative: if you want us to try writing HP anyway and deal with the overlap visually, say so. We can reverse the decision with a 2-line change.)
 
 ---
 

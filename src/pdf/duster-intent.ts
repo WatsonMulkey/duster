@@ -41,9 +41,13 @@ export const dusterIntent: FieldIntents = {
   Inventory: 'app-fill',
   Weapons: 'app-fill',
 
-  // --- Current / Max HP (2 app-fill, despite unfortunate "Now"/"Total" names) ---
-  Now: 'app-fill', // Current HP (field name is literally "Now")
-  Total: 'app-fill', // Max HP
+  // --- Current / Max HP (2 player-fill, pending Andrew template fix) ---
+  // The InDesign template has static "NOW"/"TOTAL" text baked into the field
+  // rectangles as page content, so writing any value produces visual overlap
+  // (e.g. "12" + "NOW" reads as "12OW"). Leaving blank preserves the labels.
+  // Flip both to 'app-fill' after Andrew moves the labels outside the fields.
+  Now: 'player-fill',
+  Total: 'player-fill',
 
   // --- Trackers (1 app-fill, 2 player-fill) ---
   LUCK: 'app-fill', // Starts at 0

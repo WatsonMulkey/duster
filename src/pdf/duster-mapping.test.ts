@@ -98,10 +98,10 @@ describe('dusterMapping — keen-skill checkboxes', () => {
 })
 
 describe('dusterMapping — HP and LUCK', () => {
-  it('Now = Total = "12" for level-1 character', () => {
+  it('Now and Total are NOT produced (player-fill pending template fix)', () => {
     const out = dusterMapping(happy)
-    expect(out.Now).toBe('12')
-    expect(out.Total).toBe('12')
+    expect(out.Now).toBeUndefined()
+    expect(out.Total).toBeUndefined()
   })
 
   it('LUCK = "0" for new characters', () => {

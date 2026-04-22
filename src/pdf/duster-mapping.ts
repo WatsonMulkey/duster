@@ -115,9 +115,9 @@ export const dusterMapping: FieldMapping<CharacterState> = (state) => {
   out.Inventory = state.inventory
   out.Weapons = state.weapons.map((w) => w.name).join(', ')
 
-  // HP (v1 level-1 only: always 12/12)
-  out.Now = '12'
-  out.Total = '12'
+  // HP (Now / Total) left blank — Andrew's InDesign template has static
+  // "NOW"/"TOTAL" labels inside the field rectangles that overlap any value
+  // we write. Keep as player-fill until template is fixed.
 
   // LUCK starts at 0 per Google Sheet template
   out.LUCK = '0'

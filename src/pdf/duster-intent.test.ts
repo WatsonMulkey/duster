@@ -24,7 +24,8 @@ describe('dusterIntent', () => {
     expect(artifacts).toEqual([])
   })
 
-  it('has exactly 39 app-fill and 42 player-fill', () => {
+  it('has exactly 37 app-fill and 44 player-fill', () => {
+    // Now + Total moved from app-fill to player-fill pending Andrew template fix
     const counts = Object.values(dusterIntent).reduce<
       Record<FieldIntent, number>
     >(
@@ -39,8 +40,8 @@ describe('dusterIntent', () => {
         'template-artifact': 0,
       },
     )
-    expect(counts['app-fill']).toBe(39)
-    expect(counts['player-fill']).toBe(42)
+    expect(counts['app-fill']).toBe(37)
+    expect(counts['player-fill']).toBe(44)
   })
 
   it('covers every field in the real Mac_Sheet.pdf (with aliases applied)', async () => {
