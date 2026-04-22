@@ -127,11 +127,16 @@ function updateStartingItems(items: StartingItem[]) {
     <div class="text-center">
       <h1 class="text-2xl font-bold tracking-wider mb-1" style="font-family: Georgia, serif;">DUSTER</h1>
       <p class="text-sm text-gray-500 mb-6">Character Creator Preview</p>
-      <form @submit.prevent="checkPassword" class="flex flex-col items-center gap-3">
+      <form @submit.prevent="checkPassword" class="flex flex-col items-center gap-3" autocomplete="off">
         <input
           v-model="passwordInput"
           type="password"
+          name="duster-access-code"
           placeholder="Enter access code"
+          autocomplete="one-time-code"
+          data-lpignore="true"
+          data-form-type="other"
+          spellcheck="false"
           class="border border-gray-300 rounded px-4 py-2 text-center w-56 focus:outline-none focus:border-black"
           :class="{ 'border-red-400': passwordError }"
         />
