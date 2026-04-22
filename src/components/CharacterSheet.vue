@@ -23,6 +23,7 @@ const props = defineProps<{
 }>()
 
 const bodyLocations = ['L LEG', 'R LEG', 'TORSO', 'R ARM', 'L ARM', 'HEAD']
+const bodyColumns = ['A', 'S', 'I', 'B']
 const energyGroups: { name: EnergyGroup; skills: Skill[] }[] = [
   { name: 'Mental', skills: ['Focus', 'Memory', 'Tech'] },
   { name: 'Physical', skills: ['Force', 'Reflex', 'Coordination'] },
@@ -135,31 +136,20 @@ const allTalentRows = [
         </div>
       </div>
 
-      <!-- Right: Body Grid (matches Mac_Sheet.pdf layout) -->
-      <div class="shrink-0 self-start flex items-stretch">
-        <div class="flex items-center bg-black text-white px-1 font-bold text-xs" style="writing-mode: vertical-rl; transform: rotate(180deg);">
-          BODY
-        </div>
+      <!-- Right: Body Grid -->
+      <div class="shrink-0 self-start">
+        <div class="font-bold text-xs mb-1 text-center">BODY</div>
         <table class="border-collapse text-[8pt]">
           <thead>
             <tr>
-              <th class="px-1 pb-1 font-bold text-center">A</th>
-              <th class="px-2 pb-1 font-bold text-center">S</th>
-              <th class="px-2 pb-1 font-bold text-center">I</th>
-              <th class="px-2 pb-1 font-bold text-center">B</th>
+              <th class="px-1"></th>
+              <th v-for="col in bodyColumns" :key="col" class="px-2 font-bold text-center">{{ col }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="loc in bodyLocations" :key="loc">
-              <td class="py-0.5 pr-1 whitespace-nowrap">
-                <div class="flex items-center gap-1">
-                  <span class="border border-black w-5 h-4 inline-block shrink-0"></span>
-                  <span class="font-semibold text-[7pt]">{{ loc }}</span>
-                </div>
-              </td>
-              <td class="border border-black w-6 h-4 p-0"></td>
-              <td class="border border-black w-6 h-4 p-0"></td>
-              <td class="border border-black w-6 h-4 p-0"></td>
+              <td class="pr-2 font-semibold text-right text-[7pt]">{{ loc }}</td>
+              <td v-for="col in bodyColumns" :key="col" class="border border-black w-6 h-4"></td>
             </tr>
           </tbody>
         </table>
