@@ -82,4 +82,6 @@ export interface StartingItem {
   tableNumber: number
   tableName: string
   roll: number
+  /** Position in specialtyTables[specialty] — distinguishes repeat tables (e.g. Rambler = [3,3,4]). Optional for backward-compat. */
+  slotIndex?: number
 }

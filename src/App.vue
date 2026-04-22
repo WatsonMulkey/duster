@@ -11,6 +11,7 @@ import InventoryStep from './components/wizard/InventoryStep.vue'
 import CharacterSheet from './components/CharacterSheet.vue'
 import Toast from './components/Toast.vue'
 import { useExportPdf } from './composables/useExportPdf'
+import { specialtyTables } from './data/startingItems'
 import type { Skill, Hand, TalentSlot, StartingItem } from './types'
 
 // Password gate for preview deployments (client-side only, not real security)
@@ -64,7 +65,10 @@ const canProceed = computed(() => {
     case 2: return true
     case 3: return state.startingTalent !== null
     case 4: return true
-    case 5: return state.startingItems.length > 0
+    case 5: {
+      const expected = state.specialty ? (specialtyTables[state.specialty.toUpperCase()]?.length ?? 0) : 0
+      return expected > 0 && state.startingItems.length === expected
+    }
     case 6: return state.name.trim() !== ''
     default: return false
   }
