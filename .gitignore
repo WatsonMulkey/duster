@@ -24,3 +24,11 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Test / MCP artifacts (Playwright traces, screenshots, downloads, console logs)
+.playwright-mcp/
