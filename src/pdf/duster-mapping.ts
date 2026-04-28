@@ -111,8 +111,17 @@ export const dusterMapping: FieldMapping<CharacterState> = (state) => {
   out.PHYSICAL = computeEnergyModifier(state, 'Physical')
   out.EMOTIONAL = computeEnergyModifier(state, 'Emotional')
 
-  // Inventory + weapons
-  out.Inventory = state.inventory
+  // Inventory: user-typed text + rolled specialty starting items + bonus item.
+  // The PDF has only one Inventory field, so all three streams concatenate
+  // (one per line). The wizard's STARTING ITEMS preview section has no PDF
+  // counterpart, so without this merge the rolled items wouldn't print.
+  const rolledItemNames = [
+    ...state.startingItems.map((i) => i.name),
+    state.bonusItem?.name,
+  ].filter((n): n is string => Boolean(n))
+  out.Inventory = [state.inventory, ...rolledItemNames]
+    .filter((s) => s.length > 0)
+    .join('\n')
   out.Weapons = state.weapons.map((w) => w.name).join(', ')
 
   // HP (Now / Total) left blank — Andrew's InDesign template has static

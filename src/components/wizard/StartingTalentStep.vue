@@ -23,7 +23,7 @@ const hasChoice = props.options.length > 1
     <h2 class="text-2xl font-bold mb-2">
       {{ hasChoice ? 'Choose Your Starting Talent' : 'Your Starting Talent' }}
     </h2>
-    <p class="text-gray-600 mb-6">This talent begins at Novice tier.</p>
+    <p class="text-gray-600 mb-6">This talent begins at Skilled tier.</p>
 
     <div class="flex flex-col gap-3 max-w-lg">
       <button
@@ -39,7 +39,7 @@ const hasChoice = props.options.length > 1
       >
         <div class="font-bold">{{ name }}</div>
         <div class="text-sm mt-1 opacity-85" v-if="getTalent(name)">
-          {{ getTalent(name)!.novice }}
+          {{ getTalent(name)!.skilled }}
         </div>
       </button>
     </div>

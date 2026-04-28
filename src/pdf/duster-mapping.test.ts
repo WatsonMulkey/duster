@@ -111,9 +111,65 @@ describe('dusterMapping — HP and LUCK', () => {
 })
 
 describe('dusterMapping — inventory + weapons', () => {
-  it('inventory maps to state.inventory', () => {
+  it('inventory passes through user-typed text when no rolled items', () => {
     const out = dusterMapping(happy)
     expect(out.Inventory).toBe('1 medkit, 2 rations')
+  })
+
+  it('appends rolled startingItems on their own lines after user text', () => {
+    const state: CharacterState = {
+      ...happy,
+      inventory: 'pack, bedroll',
+      startingItems: [
+        { name: '2 cans of clean H', tableNumber: 3, tableName: 'Consumables', roll: 1, slotIndex: 0 },
+        { name: 'A machete (-1 dmg)', tableNumber: 5, tableName: 'Light Melee', roll: 4, slotIndex: 1 },
+      ],
+    }
+    const out = dusterMapping(state)
+    expect(out.Inventory).toBe('pack, bedroll\n2 cans of clean H\nA machete (-1 dmg)')
+  })
+
+  it('appends bonusItem to inventory', () => {
+    const state: CharacterState = {
+      ...happy,
+      inventory: 'pack',
+      bonusItem: { name: 'A spyglass', tableNumber: 2, tableName: 'Supplies', roll: 6 },
+    }
+    const out = dusterMapping(state)
+    expect(out.Inventory).toBe('pack\nA spyglass')
+  })
+
+  it('combines user text + startingItems + bonusItem in that order', () => {
+    const state: CharacterState = {
+      ...happy,
+      inventory: 'pack',
+      startingItems: [
+        { name: '2 doses of leaf', tableNumber: 3, tableName: 'Consumables', roll: 5, slotIndex: 0 },
+      ],
+      bonusItem: { name: 'A mangy old dog', tableNumber: 1, tableName: 'Trinkets', roll: 6 },
+    }
+    const out = dusterMapping(state)
+    expect(out.Inventory).toBe('pack\n2 doses of leaf\nA mangy old dog')
+  })
+
+  it('omits empty user text (no leading blank line)', () => {
+    const state: CharacterState = {
+      ...happy,
+      inventory: '',
+      startingItems: [
+        { name: '10 scrap metal', tableNumber: 2, tableName: 'Supplies', roll: 1, slotIndex: 0 },
+      ],
+      bonusItem: null,
+    }
+    const out = dusterMapping(state)
+    expect(out.Inventory).toBe('10 scrap metal')
+  })
+
+  it('null bonusItem does not append "null" or extra newline', () => {
+    const state: CharacterState = { ...happy, inventory: 'pack', bonusItem: null }
+    const out = dusterMapping(state)
+    expect(out.Inventory).toBe('pack')
+    expect(out.Inventory).not.toContain('null')
   })
 
   it('weapons join with ", "', () => {
@@ -136,15 +192,8 @@ describe('dusterMapping — talent grid', () => {
     expect(text).toContain('Memory')
   })
 
-  it('Skilled/Expert/Master 1 blank when starting talent is Novice', () => {
+  it('Skilled 1 populated by default (every character is at least Skilled in their starting talent)', () => {
     const out = dusterMapping(happy)
-    expect(out['Skilled 1']).toBe('')
-    expect(out['Expert 1']).toBe('')
-    expect(out['Master 1']).toBe('')
-  })
-
-  it('Skilled 1 populated when startingTalentTier is Skilled', () => {
-    const out = dusterMapping({ ...happy, startingTalentTier: 'Skilled' })
     expect(out['Skilled 1']).toBeTruthy()
     expect(out['Expert 1']).toBe('')
     expect(out['Master 1']).toBe('')

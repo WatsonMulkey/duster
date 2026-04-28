@@ -6,7 +6,7 @@ import {
   isPrereqSatisfied as _isPrereqSatisfied,
   isTalentAvailable as _isTalentAvailable,
 } from '../../data/talent-prereqs'
-import type { Talent, TalentSlot, MasteryTier } from '../../types'
+import type { Talent, TalentSlot, MasteryTier, StartingTalentTier } from '../../types'
 
 const XP_COST: Record<MasteryTier, number> = {
   Novice: 2,
@@ -15,18 +15,21 @@ const XP_COST: Record<MasteryTier, number> = {
   Master: 6,
 }
 
-/** Discounted XP ladder for advancing the specialty-given starting talent. */
-const XP_COST_STARTING: Record<MasteryTier, number> = {
-  Novice: 0,
-  Skilled: 1,
-  Expert: 2,
-  Master: 4,
+/**
+ * Starting talent floors at Skilled (free); player can pay to advance further.
+ * Novice is intentionally absent — players are always at least Skilled in
+ * their specialty's starting talent.
+ */
+const XP_COST_STARTING: Record<StartingTalentTier, number> = {
+  Skilled: 0,
+  Expert: 1,
+  Master: 3,
 }
 
 const props = defineProps<{
   slots: (TalentSlot | null)[]
   startingTalent: string | null
-  startingTalentTier: MasteryTier
+  startingTalentTier: StartingTalentTier
   xpRemaining: number
   xpTotal: number
   level: number
@@ -35,10 +38,11 @@ const props = defineProps<{
 const emit = defineEmits<{
   update: [index: number, slot: TalentSlot | null]
   'update:level': [level: number]
-  'update:startingTalentTier': [tier: MasteryTier]
+  'update:startingTalentTier': [tier: StartingTalentTier]
 }>()
 
 const tiers: MasteryTier[] = ['Novice', 'Skilled', 'Expert', 'Master']
+const startingTiers: StartingTalentTier[] = ['Skilled', 'Expert', 'Master']
 
 const availableTalents = computed(() => {
   const used = new Set<string>()
@@ -66,13 +70,13 @@ function canAffordTier(slotIndex: number, tier: MasteryTier): boolean {
 }
 
 /** Can the player afford to advance the starting talent to `tier`? */
-function canAffordStartingTier(tier: MasteryTier): boolean {
+function canAffordStartingTier(tier: StartingTalentTier): boolean {
   const currentCost = XP_COST_STARTING[props.startingTalentTier]
   const newCost = XP_COST_STARTING[tier]
   return (props.xpRemaining + currentCost - newCost) >= 0
 }
 
-function setStartingTier(tier: MasteryTier) {
+function setStartingTier(tier: StartingTalentTier) {
   if (canAffordStartingTier(tier)) {
     emit('update:startingTalentTier', tier)
   }
@@ -143,10 +147,10 @@ function talentLabel(t: Talent): string {
           </div>
         </div>
 
-        <!-- Tier buttons for starting talent — discounted XP ladder (0/1/2/4) -->
+        <!-- Tier buttons for starting talent — Skilled is the free floor; advance via XP (0/1/3) -->
         <div class="flex gap-2 flex-wrap mb-2">
           <button
-            v-for="tier in tiers"
+            v-for="tier in startingTiers"
             :key="tier"
             @click="setStartingTier(tier)"
             :disabled="!canAffordStartingTier(tier)"
@@ -166,7 +170,7 @@ function talentLabel(t: Talent): string {
         <!-- Description text for the current tier -->
         <div class="text-sm opacity-85">
           <span class="font-semibold">{{ startingTalentTier }}:</span>
-          {{ getTalent(startingTalent)![startingTalentTier.toLowerCase() as 'novice' | 'skilled' | 'expert' | 'master'] }}
+          {{ getTalent(startingTalent)![startingTalentTier.toLowerCase() as 'skilled' | 'expert' | 'master'] }}
         </div>
       </div>
     </div>

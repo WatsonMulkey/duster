@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Gift, Skill, EnergyGroup, MasteryTier, TalentSlot, WeaponSlot, StartingItem, Hand } from '../types'
+import type { Gift, Skill, EnergyGroup, StartingTalentTier, TalentSlot, WeaponSlot, StartingItem, Hand } from '../types'
 import { talents } from '../data/talents'
 
 const props = defineProps<{
@@ -14,10 +14,11 @@ const props = defineProps<{
   statBoost: EnergyGroup | null
   keenSkill: Skill | null
   startingTalent: string | null
-  startingTalentTier: MasteryTier
+  startingTalentTier: StartingTalentTier
   talentSlots: (TalentSlot | null)[]
   weaponSlots: WeaponSlot[]
   startingItems: StartingItem[]
+  bonusItem: StartingItem | null
   inventory: string
   energyModifiers: Record<EnergyGroup, number>
 }>()
@@ -193,7 +194,10 @@ const allTalentRows = [
             <li v-for="(item, idx) in startingItems" :key="idx" class="py-0.5 break-words">
               {{ item.name }}
             </li>
-            <li v-if="startingItems.length === 0" class="py-0.5 text-gray-400">None</li>
+            <li v-if="bonusItem" class="py-0.5 break-words">
+              {{ bonusItem.name }} <span class="text-amber-700">(bonus)</span>
+            </li>
+            <li v-if="startingItems.length === 0 && !bonusItem" class="py-0.5 text-gray-400">None</li>
           </ul>
         </div>
       </div>

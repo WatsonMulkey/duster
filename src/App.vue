@@ -13,7 +13,7 @@ import Toast from './components/Toast.vue'
 import { useExportPdf } from './composables/useExportPdf'
 import { toasts } from './composables/useToast'
 import { specialtyTables } from './data/startingItems'
-import type { Skill, Hand, TalentSlot, StartingItem, MasteryTier } from './types'
+import type { Skill, Hand, TalentSlot, StartingItem, StartingTalentTier } from './types'
 
 // Password gate for preview deployments (client-side only, not real security)
 const previewPassword = 'dusty2026'
@@ -195,6 +195,7 @@ function updateStartingItems(items: StartingItem[]) {
         :talent-slots="state.talents"
         :weapon-slots="state.weapons"
         :starting-items="state.startingItems"
+        :bonus-item="state.bonusItem"
         :inventory="state.inventory"
         :energy-modifiers="energyModifiers"
       />
@@ -261,13 +262,15 @@ function updateStartingItems(items: StartingItem[]) {
         :level="state.level"
         @update="updateTalent"
         @update:level="(l: number) => state.level = l"
-        @update:starting-talent-tier="(t: MasteryTier) => state.startingTalentTier = t"
+        @update:starting-talent-tier="(t: StartingTalentTier) => state.startingTalentTier = t"
       />
       <StartingItemsStep
         v-if="currentStep === 5"
         :specialty="state.specialty!"
         :items="state.startingItems"
+        :bonus-item="state.bonusItem"
         @update="updateStartingItems"
+        @update:bonus-item="(b: StartingItem) => state.bonusItem = b"
       />
       <InventoryStep
         v-if="currentStep === 6"

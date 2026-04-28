@@ -136,3 +136,66 @@ describe('StartingItemsStep', () => {
     expect(wrapper.text()).toContain('click an item')
   })
 })
+
+describe('StartingItemsStep — bonus item', () => {
+  it('emits update:bonusItem on mount when bonusItem is null (auto-roll)', () => {
+    // Math.random returns 0 → table 1, slot 1 → "A pouch of radioactive dust"
+    const r = vi.spyOn(Math, 'random').mockReturnValue(0)
+    const wrapper = mount(StartingItemsStep, {
+      props: { specialty: 'STITCH', items: [], bonusItem: null },
+    })
+    r.mockRestore()
+    const emits = wrapper.emitted('update:bonusItem')!
+    expect(emits).toHaveLength(1)
+    const payload = emits[0]![0] as StartingItem
+    expect(payload.tableNumber).toBe(1)
+    expect(payload.roll).toBe(1)
+    expect(payload.name).toBe('A pouch of radioactive dust')
+    expect(payload.tableName).toBe('Trinkets')
+    expect(payload.slotIndex).toBeUndefined()
+  })
+
+  it('does NOT emit update:bonusItem when bonusItem is already set (no re-roll)', () => {
+    const existing: StartingItem = {
+      name: '2 doses of leaf',
+      tableNumber: 3,
+      tableName: 'Consumables',
+      roll: 5,
+    }
+    const wrapper = mount(StartingItemsStep, {
+      props: { specialty: 'STITCH', items: [], bonusItem: existing },
+    })
+    expect(wrapper.emitted('update:bonusItem')).toBeUndefined()
+  })
+
+  it('renders the bonus card with table name + roll + item when bonusItem is set', () => {
+    const bonus: StartingItem = {
+      name: 'A spyglass (+1 on Focus when searching at a distance)',
+      tableNumber: 2,
+      tableName: 'Supplies',
+      roll: 6,
+    }
+    const wrapper = mount(StartingItemsStep, {
+      props: { specialty: 'STITCH', items: [], bonusItem: bonus },
+    })
+    const text = wrapper.text()
+    expect(text).toContain('Bonus Item')
+    expect(text).toContain('Supplies')
+    expect(text).toContain('Table 2')
+    expect(text).toContain('d6 = 6')
+    expect(text).toContain('A spyglass')
+  })
+
+  it('does NOT render the bonus card while waiting for the auto-roll to land', () => {
+    // Before parent commits the emitted bonus back via prop, bonusItem is null
+    // and the card stays hidden. (The parent re-renders with the rolled item;
+    // this test verifies the v-if guard.)
+    vi.spyOn(Math, 'random').mockReturnValue(0)
+    const wrapper = mount(StartingItemsStep, {
+      props: { specialty: 'STITCH', items: [], bonusItem: null },
+    })
+    vi.restoreAllMocks()
+    // Prop is still null at render time — bonus card hidden until parent updates
+    expect(wrapper.text()).not.toContain('Bonus Item')
+  })
+})

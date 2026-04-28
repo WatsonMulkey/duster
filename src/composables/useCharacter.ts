@@ -9,6 +9,7 @@ import type {
   EnergyGroup,
   Gift,
   MasteryTier,
+  StartingTalentTier,
   Talent,
   Weapon,
 } from '../types'
@@ -21,16 +22,15 @@ const XP_COST_OTHER: Record<MasteryTier, number> = {
 }
 
 /**
- * Starting-talent XP cost ladder — discounted compared to additional talents.
- * Derived from Google Sheet formula: IFS(C34="Novice",0,"Skilled",1,"Expert",2,"Master",4).
- * A level-1 character (3 XP) can promote their starting talent to Skilled (1 XP)
- * or Expert (2 XP), but Master (4 XP) needs level 2+.
+ * Starting-talent XP cost ladder — every character begins Skilled in their
+ * specialty's starting talent (free), and may pay XP to advance further.
+ * A level-1 character (3 XP) can reach Master (3 XP), but only by spending
+ * everything on the starting talent.
  */
-const XP_COST_STARTING: Record<MasteryTier, number> = {
-  Novice: 0,
-  Skilled: 1,
-  Expert: 2,
-  Master: 4,
+const XP_COST_STARTING: Record<StartingTalentTier, number> = {
+  Skilled: 0,
+  Expert: 1,
+  Master: 3,
 }
 
 export function useCharacter() {
@@ -40,10 +40,11 @@ export function useCharacter() {
     keenSkill: null,
     selectedGiftIndex: 0,
     startingTalent: null,
-    startingTalentTier: 'Novice',
+    startingTalentTier: 'Skilled',
     talents: [null, null, null],
     weapons: [],
     startingItems: [],
+    bonusItem: null,
     inventory: '',
     hand: 'Right',
     level: 1,
@@ -143,7 +144,7 @@ export function useCharacter() {
     state.keenSkill = null
     state.selectedGiftIndex = 0
     state.startingTalent = null
-    state.startingTalentTier = 'Novice'
+    state.startingTalentTier = 'Skilled'
     state.talents = [null, null, null]
     state.startingItems = []
   }
@@ -154,10 +155,11 @@ export function useCharacter() {
     state.keenSkill = null
     state.selectedGiftIndex = 0
     state.startingTalent = null
-    state.startingTalentTier = 'Novice'
+    state.startingTalentTier = 'Skilled'
     state.talents = [null, null, null]
     state.weapons = []
     state.startingItems = []
+    state.bonusItem = null
     state.inventory = ''
     state.hand = 'Right'
     state.level = 1

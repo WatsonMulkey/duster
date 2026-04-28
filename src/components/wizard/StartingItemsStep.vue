@@ -1,16 +1,42 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { specialtyTables, getTable } from '../../data/startingItems'
+import { computed, onMounted } from 'vue'
+import { specialtyTables, getTable, lootTables } from '../../data/startingItems'
 import type { StartingItem } from '../../types'
 
 const props = defineProps<{
   specialty: string
   items: StartingItem[]
+  bonusItem: StartingItem | null
 }>()
 
 const emit = defineEmits<{
   update: [items: StartingItem[]]
+  'update:bonusItem': [item: StartingItem]
 }>()
+
+/**
+ * Roll a single bonus item: d6 picks the table (1-6), d6 picks the slot (1-6).
+ * Pure (takes an injectable rng for testability). Caller is responsible for
+ * gating: only roll when bonusItem is null.
+ */
+function rollBonusItem(rng: () => number = Math.random): StartingItem {
+  const tableId = Math.floor(rng() * 6) + 1
+  const slotPos = Math.floor(rng() * 6) + 1
+  const table = lootTables.find((t) => t.id === tableId)!
+  return {
+    name: table.items[slotPos - 1]!,
+    tableNumber: tableId,
+    tableName: table.name,
+    roll: slotPos,
+    // slotIndex omitted — not a specialty-table slot
+  }
+}
+
+onMounted(() => {
+  if (props.bonusItem === null) {
+    emit('update:bonusItem', rollBonusItem())
+  }
+})
 
 /**
  * Ordered list of table IDs this specialty rolls on.
@@ -71,6 +97,22 @@ const allSelected = computed(() =>
     <p class="text-gray-600 mb-4">
       Pick one item from each of your specialty's loot tables, or roll a d6 to decide for each.
     </p>
+
+    <!-- Bonus item — randomly rolled, no override -->
+    <div
+      v-if="bonusItem"
+      class="mb-6 max-w-2xl border-2 border-amber-500 bg-amber-50 rounded-lg overflow-hidden"
+    >
+      <div class="bg-amber-500 text-white px-3 py-2 flex items-center justify-between">
+        <div class="font-bold text-sm flex items-center gap-2">
+          <span aria-hidden="true">🎁</span>
+          <span>Bonus Item</span>
+          <span class="opacity-80 font-normal">— {{ bonusItem.tableName }} (Table {{ bonusItem.tableNumber }})</span>
+        </div>
+        <div class="text-xs opacity-80">d6 = {{ bonusItem.roll }}</div>
+      </div>
+      <div class="px-3 py-2 text-sm">{{ bonusItem.name }}</div>
+    </div>
 
     <!-- Roll All button -->
     <div class="mb-6">

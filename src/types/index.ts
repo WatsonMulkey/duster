@@ -13,6 +13,14 @@ export const ENERGY_SKILLS: Record<EnergyGroup, Skill[]> = {
 
 export type MasteryTier = 'Novice' | 'Skilled' | 'Expert' | 'Master'
 
+/**
+ * Starting-talent floor: every character is Skilled in their specialty's
+ * starting talent. The wizard lets players pay XP to advance further (Expert,
+ * Master), but they cannot drop below Skilled. Novice is reserved for
+ * additional talent slots, which still use the full MasteryTier.
+ */
+export type StartingTalentTier = Exclude<MasteryTier, 'Novice'>
+
 export type Hand = 'Right' | 'Left' | 'Both'
 
 export interface Specialty {
@@ -60,11 +68,13 @@ export interface CharacterState {
   keenSkill: Skill | null
   selectedGiftIndex: 0 | 1
   startingTalent: string | null
-  /** Tier the starting talent has been advanced to. Default 'Novice'. */
-  startingTalentTier: MasteryTier
+  /** Tier the starting talent has been advanced to. Default 'Skilled' (the floor). */
+  startingTalentTier: StartingTalentTier
   talents: (TalentSlot | null)[]
   weapons: WeaponSlot[]
   startingItems: StartingItem[]
+  /** Single random bonus item — every character gets one. Specialty-agnostic, no override, rolled once. */
+  bonusItem: StartingItem | null
   inventory: string
   hand: Hand
   level: number
