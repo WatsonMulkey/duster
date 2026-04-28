@@ -65,6 +65,22 @@ Wait for the deploy to land (Vercel will tail the build log).
 
 ## Step 3 — Pre-test against the actual deploy URL
 
+Verified once for the Duster engagement and not expected to need re-running
+for similar future engagements (Vite + pdf-lib + Vercel + iframe embed):
+
+- ✅ End-to-end wizard against `npm run preview` produces a correctly-filled
+  PDF (verified 2026-04-27 via `scripts/inspect-pdf.mjs`).
+- ✅ Cross-origin iframe scenario (parent on a different port iframes the
+  app) reaches and triggers the Export download successfully in Chrome
+  (verified 2026-04-27 with a 2-port local test).
+- ✅ Vercel deploy headers don't include `X-Frame-Options` or restrictive
+  `Content-Security-Policy: frame-ancestors` (verified via `curl -sI` on
+  `duster-seven.vercel.app`).
+
+For a future engagement on the same stack, you can skip rerunning the
+cross-origin test and rely on these prior results unless the deploy host or
+embed surface changes materially.
+
 The Playwright + pdf-lib walkthrough you ran earlier was against
 `npm run preview`. That validates the production bundle locally. This step
 validates the *Vercel-served* bundle — same code, but with whatever Vercel

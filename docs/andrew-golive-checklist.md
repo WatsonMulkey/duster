@@ -159,12 +159,12 @@ character end-to-end while the password gate is still up.
 If anything looks off, screenshot the issue + the character data and email
 Watson. He'll fix-and-redeploy without you needing to touch code.
 
-**One edge case to know about.** Some browsers can be finicky about letting
-an embedded iframe trigger file downloads. If a player clicks **Export
-Fillable PDF** inside the iframe and nothing happens, tell them to open
-`https://{{SUBDOMAIN}}` in a new tab and try again — same wizard, same
-button, but no iframe in the way. We haven't seen this in testing, but the
-fallback exists if it ever crops up.
+**One edge case to know about.** Cross-origin iframes can occasionally have
+trouble triggering file downloads in some browsers. We've verified the
+end-to-end flow in Chrome (which is what the vast majority of your players
+will use), but if a player ever clicks **Export Fillable PDF** inside the
+iframe and nothing happens, tell them to open `https://{{SUBDOMAIN}}` in a
+new tab and try again — same wizard, same button, but no iframe in the way.
 
 ---
 
