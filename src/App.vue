@@ -13,7 +13,7 @@ import Toast from './components/Toast.vue'
 import { useExportPdf } from './composables/useExportPdf'
 import { toasts } from './composables/useToast'
 import { specialtyTables } from './data/startingItems'
-import { buildInventorySeed } from './data/defaultKit'
+import { buildInventorySeed, roll2d6 } from './data/defaultKit'
 import type { Skill, Hand, TalentSlot, StartingItem, StartingTalentTier } from './types'
 
 // Password gate for preview deployments (client-side only, not real security)
@@ -90,15 +90,21 @@ watch(() => startingTalentOptions.value, (opts) => {
 // that it's theirs to edit; we never silently clobber. The "Reset to starting
 // gear" button (resetInventory) re-pulls on demand.
 const inventorySeeded = ref(false)
+
+// Rolls a fresh 2d6 bolt count each time (kit + rolled items + bonus).
+function seedInventory(): string {
+  return buildInventorySeed(state.startingItems, state.bonusItem, roll2d6())
+}
+
 watch(currentStep, (step) => {
   if (step === steps.indexOf('Details') && !inventorySeeded.value) {
-    state.inventory = buildInventorySeed(state.startingItems, state.bonusItem)
+    state.inventory = seedInventory()
     inventorySeeded.value = true
   }
 })
 
 function resetInventory() {
-  state.inventory = buildInventorySeed(state.startingItems, state.bonusItem)
+  state.inventory = seedInventory()
   inventorySeeded.value = true
 }
 

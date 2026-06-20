@@ -122,7 +122,7 @@ describe('dusterMapping — inventory + weapons', () => {
   })
 
   it('preserves multi-line inventory exactly', () => {
-    const text = '1 pack (100 lb carrying capacity)\n2d6 bolts\nA machete (-1 dmg)'
+    const text = '1 pack (100 lb carrying capacity)\n9 bolts\nA machete (-1 dmg)'
     const out = dusterMapping({ ...happy, inventory: text })
     expect(out.Inventory).toBe(text)
   })
