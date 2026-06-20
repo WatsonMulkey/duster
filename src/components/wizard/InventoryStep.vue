@@ -13,7 +13,7 @@ const emit = defineEmits<{
   'update:hand': [value: Hand]
 }>()
 
-const hands: Hand[] = ['Right', 'Left', 'Both']
+const hands: Hand[] = ['Right', 'Left']
 </script>
 
 <template>

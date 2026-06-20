@@ -90,7 +90,7 @@ export const dusterSamples: CharacterState[] = [
     startingItems: [],
     bonusItem: null,
     inventory: '',
-    hand: 'Both',
+    hand: 'Left',
     level: 1,
   },
 

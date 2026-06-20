@@ -21,7 +21,10 @@ export type MasteryTier = 'Novice' | 'Skilled' | 'Expert' | 'Master'
  */
 export type StartingTalentTier = Exclude<MasteryTier, 'Novice'>
 
-export type Hand = 'Right' | 'Left' | 'Both'
+// Ambidexterity ("Both") is granted by talents, not chosen at creation, and
+// this app is creation-only (no leveling) — so a character's Dominant Hand is
+// always a single hand. See Andrew/Occupied Hex feedback 2026-06-19.
+export type Hand = 'Right' | 'Left'
 
 export interface Specialty {
   name: string
