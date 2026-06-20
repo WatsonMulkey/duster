@@ -111,65 +111,38 @@ describe('dusterMapping — HP and LUCK', () => {
 })
 
 describe('dusterMapping — inventory + weapons', () => {
-  it('inventory passes through user-typed text when no rolled items', () => {
+  // The Inventory box is now the single source of truth: the wizard seeds it
+  // with default kit + rolled items + bonus, then the player edits it freely.
+  // The mapping must pass it through verbatim — re-appending startingItems /
+  // bonusItem here would double-list them on the PDF.
+
+  it('passes the Inventory box through verbatim', () => {
     const out = dusterMapping(happy)
     expect(out.Inventory).toBe('1 medkit, 2 rations')
   })
 
-  it('appends rolled startingItems on their own lines after user text', () => {
-    const state: CharacterState = {
-      ...happy,
-      inventory: 'pack, bedroll',
-      startingItems: [
-        { name: '2 cans of clean H', tableNumber: 3, tableName: 'Consumables', roll: 1, slotIndex: 0 },
-        { name: 'A machete (-1 dmg)', tableNumber: 5, tableName: 'Light Melee', roll: 4, slotIndex: 1 },
-      ],
-    }
-    const out = dusterMapping(state)
-    expect(out.Inventory).toBe('pack, bedroll\n2 cans of clean H\nA machete (-1 dmg)')
+  it('preserves multi-line inventory exactly', () => {
+    const text = '1 pack (100 lb carrying capacity)\n2d6 bolts\nA machete (-1 dmg)'
+    const out = dusterMapping({ ...happy, inventory: text })
+    expect(out.Inventory).toBe(text)
   })
 
-  it('appends bonusItem to inventory', () => {
+  it('does NOT re-append rolled startingItems or bonusItem (no double-listing)', () => {
     const state: CharacterState = {
       ...happy,
-      inventory: 'pack',
+      inventory: 'just this',
+      startingItems: [
+        { name: 'A machete (-1 dmg)', tableNumber: 5, tableName: 'Light Melee', roll: 4, slotIndex: 1 },
+      ],
       bonusItem: { name: 'A spyglass', tableNumber: 2, tableName: 'Supplies', roll: 6 },
     }
     const out = dusterMapping(state)
-    expect(out.Inventory).toBe('pack\nA spyglass')
+    expect(out.Inventory).toBe('just this')
   })
 
-  it('combines user text + startingItems + bonusItem in that order', () => {
-    const state: CharacterState = {
-      ...happy,
-      inventory: 'pack',
-      startingItems: [
-        { name: '2 doses of leaf', tableNumber: 3, tableName: 'Consumables', roll: 5, slotIndex: 0 },
-      ],
-      bonusItem: { name: 'A mangy old dog', tableNumber: 1, tableName: 'Trinkets', roll: 6 },
-    }
-    const out = dusterMapping(state)
-    expect(out.Inventory).toBe('pack\n2 doses of leaf\nA mangy old dog')
-  })
-
-  it('omits empty user text (no leading blank line)', () => {
-    const state: CharacterState = {
-      ...happy,
-      inventory: '',
-      startingItems: [
-        { name: '10 scrap metal', tableNumber: 2, tableName: 'Supplies', roll: 1, slotIndex: 0 },
-      ],
-      bonusItem: null,
-    }
-    const out = dusterMapping(state)
-    expect(out.Inventory).toBe('10 scrap metal')
-  })
-
-  it('null bonusItem does not append "null" or extra newline', () => {
-    const state: CharacterState = { ...happy, inventory: 'pack', bonusItem: null }
-    const out = dusterMapping(state)
-    expect(out.Inventory).toBe('pack')
-    expect(out.Inventory).not.toContain('null')
+  it('empty inventory maps to an empty string', () => {
+    const out = dusterMapping({ ...happy, inventory: '', startingItems: [], bonusItem: null })
+    expect(out.Inventory).toBe('')
   })
 
   it('weapons join with ", "', () => {

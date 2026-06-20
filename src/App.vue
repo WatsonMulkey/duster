@@ -13,6 +13,7 @@ import Toast from './components/Toast.vue'
 import { useExportPdf } from './composables/useExportPdf'
 import { toasts } from './composables/useToast'
 import { specialtyTables } from './data/startingItems'
+import { buildInventorySeed } from './data/defaultKit'
 import type { Skill, Hand, TalentSlot, StartingItem, StartingTalentTier } from './types'
 
 // Password gate for preview deployments (client-side only, not real security)
@@ -84,6 +85,23 @@ watch(() => startingTalentOptions.value, (opts) => {
   if (opts.length === 1) state.startingTalent = opts[0]
 }, { immediate: true })
 
+// Seed the single, editable Inventory box once — the first time the player
+// reaches the Details step — with default kit + rolled items + bonus. After
+// that it's theirs to edit; we never silently clobber. The "Reset to starting
+// gear" button (resetInventory) re-pulls on demand.
+const inventorySeeded = ref(false)
+watch(currentStep, (step) => {
+  if (step === steps.indexOf('Details') && !inventorySeeded.value) {
+    state.inventory = buildInventorySeed(state.startingItems, state.bonusItem)
+    inventorySeeded.value = true
+  }
+})
+
+function resetInventory() {
+  state.inventory = buildInventorySeed(state.startingItems, state.bonusItem)
+  inventorySeeded.value = true
+}
+
 function nextStep() {
   if (currentStep.value < steps.length - 1) {
     currentStep.value++
@@ -111,6 +129,7 @@ function startOver() {
   reset()
   currentStep.value = 0
   showSheet.value = false
+  inventorySeeded.value = false
   // Clear any lingering toasts (e.g. an export error toast from before reset)
   toasts.value = []
 }
@@ -194,8 +213,6 @@ function updateStartingItems(items: StartingItem[]) {
         :starting-talent-tier="state.startingTalentTier"
         :talent-slots="state.talents"
         :weapon-slots="state.weapons"
-        :starting-items="state.startingItems"
-        :bonus-item="state.bonusItem"
         :inventory="state.inventory"
         :energy-modifiers="energyModifiers"
       />
@@ -280,6 +297,7 @@ function updateStartingItems(items: StartingItem[]) {
         @update:name="(v: string) => state.name = v"
         @update:inventory="(v: string) => state.inventory = v"
         @update:hand="(h: Hand) => state.hand = h"
+        @reset="resetInventory"
       />
     </main>
 

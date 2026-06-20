@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Gift, Skill, EnergyGroup, StartingTalentTier, TalentSlot, WeaponSlot, StartingItem, Hand } from '../types'
+import type { Gift, Skill, EnergyGroup, StartingTalentTier, TalentSlot, WeaponSlot, Hand } from '../types'
 import { talents } from '../data/talents'
 
 const props = defineProps<{
@@ -17,8 +17,6 @@ const props = defineProps<{
   startingTalentTier: StartingTalentTier
   talentSlots: (TalentSlot | null)[]
   weaponSlots: WeaponSlot[]
-  startingItems: StartingItem[]
-  bonusItem: StartingItem | null
   inventory: string
   energyModifiers: Record<EnergyGroup, number>
 }>()
@@ -181,24 +179,10 @@ const allTalentRows = [
 
       <!-- Right: Inventory + Weapons -->
       <div class="flex-1 min-w-0 space-y-3">
-        <!-- Inventory -->
+        <!-- Inventory \u2014 single box: default kit + rolled items + bonus + the player's edits -->
         <div>
           <div class="bg-black text-white font-bold text-sm px-2 py-1 mb-1">INVENTORY</div>
-          <div class="border border-black p-2 min-h-[80px] text-[8pt] whitespace-pre-wrap break-all overflow-hidden">{{ inventory || '\u00A0' }}</div>
-        </div>
-
-        <!-- Starting Items -->
-        <div>
-          <div class="bg-black text-white font-bold text-sm px-2 py-1 mb-1">STARTING ITEMS</div>
-          <ul class="text-[8pt] space-y-0.5 pl-1 overflow-hidden">
-            <li v-for="(item, idx) in startingItems" :key="idx" class="py-0.5 break-words">
-              {{ item.name }}
-            </li>
-            <li v-if="bonusItem" class="py-0.5 break-words">
-              {{ bonusItem.name }} <span class="text-amber-700">(bonus)</span>
-            </li>
-            <li v-if="startingItems.length === 0 && !bonusItem" class="py-0.5 text-gray-400">None</li>
-          </ul>
+          <div class="border border-black p-2 min-h-[200px] text-[8pt] whitespace-pre-wrap break-words overflow-hidden">{{ inventory || '\u00A0' }}</div>
         </div>
       </div>
     </div>
